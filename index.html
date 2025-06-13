@@ -57,7 +57,7 @@
             </div>
         </section>
 
-        <!-- Module 1: Basic Vocabulary - Modified for matching task -->
+        <!-- Module 1: Basic Vocabulary -->
         <section id="moduuli1" class="module">
             <div class="module-content">
                 <h2 data-translate="module1-title">Moduuli 1: Perussanasto</h2>
@@ -69,46 +69,132 @@
                                 <span class="play-icon">▶</span>
                             </button>
                             <audio id="task1a-audio" src="audio/task1a.mp3"></audio>
-                            <p data-translate="task1a" data-audio-id="task1a-audio">Tehtävä 1. Klikkaa puhekuplaa ja kuuntele sana. Yhdistä sana oikeaan kuvaan. Klikkaa kuvaa hiirellä.</p>
+                            <p data-translate="task1a" data-audio-id="task1a-audio">Tehtävä 1a. Klikkaa puhekuplaa ja kuuntele sana. Yhdistä sana oikeaan kuvaan. Klikkaa kuvaa hiirellä.</p>
                         </div>
                     </div>
                     
-                    <div class="vocabulary-task">
-                        <!-- Current word to match -->
-                        <div class="current-word-bubble">
-                            <!-- Will be populated by JavaScript -->
-                        </div>
-                        
-                        <!-- Feedback message -->
-                        <div id="vocab-feedback" class="feedback"></div>
-                        
-                        <!-- Grid of images to match -->
-                        <div class="vocab-image-grid">
-                            <div class="vocab-image-container" data-word="hunaja">
+                    <div class="vocabulary-grid">
+                        <div class="vocabulary-item" data-word="hunaja">
+                            <div class="word-bubble">
+                                <button class="play-audio" onclick="playAudio('hunaja-audio')">
+                                    <span class="play-icon">▶</span>
+                                </button>
+                                <audio id="hunaja-audio" src="audio/hunaja.mp3"></audio>
+                                <span data-audio-id="hunaja-audio">hunaja</span>
+                            </div>
+                            <div class="image-container">
                                 <img src="https://drive.google.com/thumbnail?id=1ZhIpu1M1qlTG7IN6XKiHUWZtEnw1lzoc&sz=s800" alt="hunaja" class="vocab-image">
                             </div>
-                            <div class="vocab-image-container" data-word="makeutusaine">
+                        </div>
+                        
+                        <div class="vocabulary-item" data-word="makeutusaine">
+                            <div class="word-bubble">
+                                <button class="play-audio" onclick="playAudio('makeutusaine-audio')">
+                                    <span class="play-icon">▶</span>
+                                </button>
+                                <audio id="makeutusaine-audio" src="audio/makeutusaine.mp3"></audio>
+                                <span data-audio-id="makeutusaine-audio">makeutusaine</span>
+                            </div>
+                            <div class="image-container">
                                 <img src="https://drive.google.com/thumbnail?id=1DfZQ6Vwx1yZ0GIfnePQLSe9MjFMT1IH6&sz=s800" alt="makeutusaine" class="vocab-image">
                             </div>
-                            <div class="vocab-image-container" data-word="kakkupalat">
+                        </div>
+                        
+                        <div class="vocabulary-item" data-word="kakkupalat">
+                            <div class="word-bubble">
+                                <button class="play-audio" onclick="playAudio('kakkupalat-audio')">
+                                    <span class="play-icon">▶</span>
+                                </button>
+                                <audio id="kakkupalat-audio" src="audio/kakkupalat.mp3"></audio>
+                                <span data-audio-id="kakkupalat-audio">kakkupalat</span>
+                            </div>
+                            <div class="image-container">
                                 <img src="https://drive.google.com/thumbnail?id=1hrO1XQy6rrNfdQjMQS11jXbpVRz_aEev&sz=s800" alt="kakkupalat" class="vocab-image">
                             </div>
-                            <div class="vocab-image-container" data-word="kahvitermos">
+                        </div>
+                        
+                        <div class="vocabulary-item" data-word="kahvitermos">
+                            <div class="word-bubble">
+                                <button class="play-audio" onclick="playAudio('kahvitermos-audio')">
+                                    <span class="play-icon">▶</span>
+                                </button>
+                                <audio id="kahvitermos-audio" src="audio/kahvitermos.mp3"></audio>
+                                <span data-audio-id="kahvitermos-audio">kahvitermos</span>
+                            </div>
+                            <div class="image-container">
                                 <img src="https://drive.google.com/thumbnail?id=1gN9cb_-ro-rIORIy8WQGTmkC0Z6FViZ-&sz=s800" alt="kahvitermos" class="vocab-image">
                             </div>
-                            <div class="vocab-image-container" data-word="kahviautomaatti">
+                        </div>
+                        
+                        <div class="vocabulary-item" data-word="kahviautomaatti">
+                            <div class="word-bubble">
+                                <button class="play-audio" onclick="playAudio('kahviautomaatti-audio')">
+                                    <span class="play-icon">▶</span>
+                                </button>
+                                <audio id="kahviautomaatti-audio" src="audio/kahviautomaatti.mp3"></audio>
+                                <span data-audio-id="kahviautomaatti-audio">kahviautomaatti</span>
+                            </div>
+                            <div class="image-container">
                                 <img src="https://drive.google.com/thumbnail?id=1WVQHdYbr4q31-ROPP4Q8sRyIxycBDHl-&sz=s800" alt="kahviautomaatti" class="vocab-image">
                             </div>
-                            <div class="vocab-image-container" data-word="vedenkeitin">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="exercise">
+                    <div class="exercise-instructions">
+                        <p data-translate="task1b">Tehtävä 1b</p>
+                    </div>
+                    
+                    <div class="vocabulary-grid">
+                        <div class="vocabulary-item" data-word="vedenkeitin">
+                            <div class="word-bubble">
+                                <button class="play-audio" onclick="playAudio('vedenkeitin-audio')">
+                                    <span class="play-icon">▶</span>
+                                </button>
+                                <audio id="vedenkeitin-audio" src="audio/vedenkeitin.mp3"></audio>
+                                <span data-audio-id="vedenkeitin-audio">vedenkeitin</span>
+                            </div>
+                            <div class="image-container">
                                 <img src="https://drive.google.com/thumbnail?id=1B3LgMYzXRIRIQFDxCcxpz9iYlwDBsPFe&sz=s800" alt="vedenkeitin" class="vocab-image">
                             </div>
-                            <div class="vocab-image-container" data-word="sokeri">
+                        </div>
+                        
+                        <div class="vocabulary-item" data-word="sokeri">
+                            <div class="word-bubble">
+                                <button class="play-audio" onclick="playAudio('sokeri-audio')">
+                                    <span class="play-icon">▶</span>
+                                </button>
+                                <audio id="sokeri-audio" src="audio/sokeri.mp3"></audio>
+                                <span data-audio-id="sokeri-audio">sokeri</span>
+                            </div>
+                            <div class="image-container">
                                 <img src="https://drive.google.com/thumbnail?id=1WkZerKWcHYAApCscatfDDCbV_JrZJYxt&sz=s800" alt="sokeri" class="vocab-image">
                             </div>
-                            <div class="vocab-image-container" data-word="juomalasit">
+                        </div>
+                        
+                        <div class="vocabulary-item" data-word="juomalasit">
+                            <div class="word-bubble">
+                                <button class="play-audio" onclick="playAudio('juomalasit-audio')">
+                                    <span class="play-icon">▶</span>
+                                </button>
+                                <audio id="juomalasit-audio" src="audio/juomalasit.mp3"></audio>
+                                <span data-audio-id="juomalasit-audio">juomalasit</span>
+                            </div>
+                            <div class="image-container">
                                 <img src="https://drive.google.com/thumbnail?id=1OPdNo7I7hMqG25CX1yY5reQCZaUxsomW&sz=s800" alt="juomalasit" class="vocab-image">
                             </div>
-                            <div class="vocab-image-container" data-word="teepussit">
+                        </div>
+                        
+                        <div class="vocabulary-item" data-word="teepussit">
+                            <div class="word-bubble">
+                                <button class="play-audio" onclick="playAudio('teepussit-audio')">
+                                    <span class="play-icon">▶</span>
+                                </button>
+                                <audio id="teepussit-audio" src="audio/teepussit.mp3"></audio>
+                                <span data-audio-id="teepussit-audio">teepussit</span>
+                            </div>
+                            <div class="image-container">
                                 <img src="https://drive.google.com/thumbnail?id=1V6XSqVqH2ukCnZd5iQb206511bt2cPXe&sz=s800" alt="teepussit" class="vocab-image">
                             </div>
                         </div>
@@ -175,6 +261,8 @@
                             <audio id="question-audio" src="audio/question.mp3"></audio>
                             <p id="current-question-text" data-audio-id="question-audio">Hei! Tämä on mukava kahvila. Tässä kahvilassa on itsepalvelu. Se tarkoittaa, että sinä voit ottaa kahvia tai teetä itse.</p>
                         </div>
+                        
+                        <button onclick="playNextQuestion()" class="next-question-btn" data-translate="next-question">Seuraava kysymys</button>
                     </div>
                     
                     <div id="feedback-container" class="feedback-container">
@@ -322,33 +410,157 @@
             </div>
         </section>
 
-        <!-- Module 4: Text Comprehension - Modified for true/false task -->
+        <!-- Module 4: Text Comprehension -->
         <section id="moduuli4" class="module">
             <div class="module-content">
                 <h2 data-translate="module4-title">Moduuli 4: Tekstin ymmärtäminen</h2>
                 
                 <!-- Added image at the start of Module 4 -->
                 <div class="module-image">
-                    <img src="https://drive.google.com/thumbnail?id=1jSuQ52hk1IEW0oHvpqnYQDwdqG9twTva&sz=s800" alt="Kahvila" class="main-image">
+                    <img src="https://drive.google.com/thumbnail?id=18QTgdcO7aa1uF8auHozr-jT3-I5_yHBF&sz=s800" alt="Kahvila" class="main-image">
                 </div>
                 
                 <div class="exercise">
                     <div class="exercise-instructions">
                         <div class="audio-text-container">
-                            <button class="play-audio" onclick="playAudio('task4-audio')">
+                            <button class="play-audio" onclick="playAudio('task4a-audio')">
                                 <span class="play-icon">▶</span>
                             </button>
-                            <audio id="task4-audio" src="audio/task4.mp3"></audio>
-                            <p data-translate="task4" data-audio-id="task4-audio">Tehtävä 4. Katso kuvaa, kuuntele ja klikkaa, onko lause oikein vai väärin.</p>
+                            <audio id="task4a-audio" src="audio/task4a.mp3"></audio>
+                            <p data-translate="task4a" data-audio-id="task4a-audio">Tehtävä 4a. Tekstin ymmärtäminen. Tämä on autenttinen teksti työpaikan kahvihuoneen seinällä. Kuuntele tekstin lauseet ja toista ne mallin mukaan.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="authentic-text">
+                        <div class="notice-board">
+                            <h3 data-translate="notice-title">Henkilökunnan taukotilan käyttäjät</h3>
+                            <ul>
+                                <li>
+                                    <button class="play-audio" onclick="playAudio('rule1-audio')">
+                                        <span class="play-icon">▶</span>
+                                    </button>
+                                    <audio id="rule1-audio" src="audio/rule1.mp3"></audio>
+                                    <span data-translate="rule1" data-audio-id="rule1-audio">Jokainen huolehtii tiskikoneen täyttämisestä ja tyhjentämisestä.</span>
+                                </li>
+                                <li>
+                                    <button class="play-audio" onclick="playAudio('rule2-audio')">
+                                        <span class="play-icon">▶</span>
+                                    </button>
+                                    <audio id="rule2-audio" src="audio/rule2.mp3"></audio>
+                                    <span data-translate="rule2" data-audio-id="rule2-audio">Likaiset astiat viedään suoraan tiskikoneeseen.</span>
+                                </li>
+                                <li>
+                                    <button class="play-audio" onclick="playAudio('rule3-audio')">
+                                        <span class="play-icon">▶</span>
+                                    </button>
+                                    <audio id="rule3-audio" src="audio/rule3.mp3"></audio>
+                                    <span data-translate="rule3" data-audio-id="rule3-audio">Jos kone on täynnä, käynnistä kone.</span>
+                                </li>
+                                <li>
+                                    <button class="play-audio" onclick="playAudio('rule4-audio')">
+                                        <span class="play-icon">▶</span>
+                                    </button>
+                                    <audio id="rule4-audio" src="audio/rule4.mp3"></audio>
+                                    <span data-translate="rule4" data-audio-id="rule4-audio">Älä jätä kaappiin ruokaa vanhenemaan.</span>
+                                </li>
+                                <li>
+                                    <button class="play-audio" onclick="playAudio('rule5-audio')">
+                                        <span class="play-icon">▶</span>
+                                    </button>
+                                    <audio id="rule5-audio" src="audio/rule5.mp3"></audio>
+                                    <span data-translate="rule5" data-audio-id="rule5-audio">Jokainen korjaa omat jälkensä.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="exercise">
+                    <div class="exercise-instructions">
+                        <div class="audio-text-container">
+                            <button class="play-audio" onclick="playAudio('task4b-audio')">
+                                <span class="play-icon">▶</span>
+                            </button>
+                            <audio id="task4b-audio" src="audio/task4b.mp3"></audio>
+                            <p data-translate="task4b" data-audio-id="task4b-audio">Tehtävä 4b. Lue teksti uudelleen. Kuinka monta sanaa ymmärrät?</p>
+                        </div>
+                    </div>
+                    
+                    <div class="word-counter">
+                        <p data-translate="word-count-prompt">Merkitse, kuinka monta sanaa ymmärrät:</p>
+                        <div class="word-counter-options">
+                            <button onclick="markUnderstanding(1)" data-translate="words-1-5">1-5 sanaa</button>
+                            <button onclick="markUnderstanding(2)" data-translate="words-6-10">6-10 sanaa</button>
+                            <button onclick="markUnderstanding(3)" data-translate="words-11-15">11-15 sanaa</button>
+                            <button onclick="markUnderstanding(4)" data-translate="words-16-20">16-20 sanaa</button>
+                            <button onclick="markUnderstanding(5)" data-translate="words-20plus">Yli 20 sanaa</button>
+                        </div>
+                        <p id="understanding-feedback" class="understanding-feedback"></p>
+                    </div>
+                </div>
+                
+                <div class="exercise">
+                    <div class="exercise-instructions">
+                        <div class="audio-text-container">
+                            <button class="play-audio" onclick="playAudio('task4c-audio')">
+                                <span class="play-icon">▶</span>
+                            </button>
+                            <audio id="task4c-audio" src="audio/task4c.mp3"></audio>
+                            <p data-translate="task4c" data-audio-id="task4c-audio">Tehtävä 4c. Käännä teksti tekoälyn tai kääntäjän avulla ja vastaa, onko lause oikein vai väärin.</p>
                         </div>
                     </div>
                     
                     <div class="true-false-exercise">
-                        <div id="true-false-questions" class="true-false-questions">
-                            <!-- Will be populated by JavaScript -->
+                        <div class="translation-tools">
+                            <button onclick="openTranslator()" data-translate="open-translator">Avaa kääntäjä</button>
                         </div>
                         
-                        <p id="module4-completion" class="completion-message"></p>
+                        <div class="true-false-questions">
+                            <div class="true-false-question">
+                                <p data-translate="question1">1. Vain työpaikan sihteeri voi laittaa astiat tiskikoneeseen tai pois tiskikoneesta.</p>
+                                <div class="true-false-options">
+                                    <button onclick="checkTrueFalse(1, 'false')" class="true-false-btn" data-translate="true">Oikein</button>
+                                    <button onclick="checkTrueFalse(1, 'true')" class="true-false-btn" data-translate="false">Väärin</button>
+                                </div>
+                                <p class="feedback" id="feedback-1"></p>
+                            </div>
+                            
+                            <div class="true-false-question">
+                                <p data-translate="question2">2. Sinä voit laittaa likaisen kupin kahvihuoneen pöydälle.</p>
+                                <div class="true-false-options">
+                                    <button onclick="checkTrueFalse(2, 'false')" class="true-false-btn" data-translate="true">Oikein</button>
+                                    <button onclick="checkTrueFalse(2, 'true')" class="true-false-btn" data-translate="false">Väärin</button>
+                                </div>
+                                <p class="feedback" id="feedback-2"></p>
+                            </div>
+                            
+                            <div class="true-false-question">
+                                <p data-translate="question3">3. Sinä voit käynnistää tiskikoneen itse.</p>
+                                <div class="true-false-options">
+                                    <button onclick="checkTrueFalse(3, 'true')" class="true-false-btn" data-translate="true">Oikein</button>
+                                    <button onclick="checkTrueFalse(3, 'false')" class="true-false-btn" data-translate="false">Väärin</button>
+                                </div>
+                                <p class="feedback" id="feedback-3"></p>
+                            </div>
+                            
+                            <div class="true-false-question">
+                                <p data-translate="question4">4. Sinä voit laittaa tuoretta ruokaa jääkaappiin.</p>
+                                <div class="true-false-options">
+                                    <button onclick="checkTrueFalse(4, 'true')" class="true-false-btn" data-translate="true">Oikein</button>
+                                    <button onclick="checkTrueFalse(4, 'false')" class="true-false-btn" data-translate="false">Väärin</button>
+                                </div>
+                                <p class="feedback" id="feedback-4"></p>
+                            </div>
+                            
+                            <div class="true-false-question">
+                                <p data-translate="question5">5. Kaikki työntekijät siivoavat kahvihuoneessa.</p>
+                                <div class="true-false-options">
+                                    <button onclick="checkTrueFalse(5, 'true')" class="true-false-btn" data-translate="true">Oikein</button>
+                                    <button onclick="checkTrueFalse(5, 'false')" class="true-false-btn" data-translate="false">Väärin</button>
+                                </div>
+                                <p class="feedback" id="feedback-5"></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
