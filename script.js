@@ -124,9 +124,113 @@ let currentSpeechUtterance = null
 function speakFinnishWord(text) {
   console.log("Speaking Finnish only:", text)
 
-  // Stop any currently playing speech
+  // Stop any currently playing speech or audio
   stopCurrentSpeech()
 
+  let audioId = null
+
+  // Comprehensive text-to-audio mapping
+  const textToAudioMap = {
+    // Module 2 specific texts
+    "Hei! Tämä on mukava kahvila. Tässä kahvilassa on itsepalvelu. Se tarkoittaa, että sinä voit ottaa kahvia tai teetä itse. Kuvassa on paljon kaikkea sellaista, mitä tarvitset kahvilassa. Etsi minulle kuvasta seuraavat tavarat:":
+      "m2start-audio",
+    "Hienoa! Löysit kuvasta kaikki tärkeät kahvilan tavarat. Opiskele sanat hyvin, koska tarvitset niitä varmasti myöhemmin!":
+      "m2end-audio",
+    "Ensin helppo sana. Missä on kahviautomaatti?": "m2q1-audio",
+    "Joo, se on kahviautomaatti. Sinä voit valita, millaista kahvia haluat. Otatko maitokahvia, espressoa vai jotain muuta? Minä tykkään tavallisesta mustasta kahvista.":
+      "m2q1true-audio",
+    "Se ei ole kahviautomaatti. Kahviautomaatti on iso ja musta kone.": "m2q1false-audio",
+    "Tiedätkö, missä on vedenkeitin?": "m2q2-audio",
+    "Kyllä, se on valkoinen vedenkeitin. Tämän vedenkeittimen merkki on Smeg. Vedenkeitin on tosi hyödyllinen, koska voit keittää sillä kuumaa vettä nopeasti.":
+      "m2q2true-audio",
+    "Se ei ole vedenkeitin. Vedenkeitin on valkoinen.": "m2q2false-audio",
+    "Missä on kahvitermos?": "m2q3-audio",
+    "Ei, se ei ole kahvitermos. Kuvassa on kaksi samanlaista kahvitermosta. Löydätkö ne?": "m2q3false-audio",
+    "Juu, se on kahvitermos. Tässä kahvilassa onkin kaksi kahvitermosta. Termoksessa on kuumaa kahvia.":
+      "m2q3true-audio",
+    "Missä ovat teepussit? Löydätkö ne?": "m2q4-audio",
+    "Kyllä, siinä ovat teepussit. Minä juon yleensä mustaherukkateetä. Mistä teestä sinä tykkäät?": "m2q4true-audio",
+    "Nyt meni väärin. Teepussit ovat vedenkeittimen lähellä.": "m2q4false-audio",
+    "Missä on hunajaa?": "m2q5-audio",
+    "Hyvä, löysit hunajan! Tässä on kaksi pulloa hunajaa. Minä käytän hunajaa, kun juon teetä.": "m2q5true-audio",
+    "Se ei ole hunajaa. Kokeile uudelleen!": "m2q5false-audio",
+    "Ja vielä lopuksi. Kuvassa on viisi purkkia makeutusainetta. Missä ne ovat?": "m2q6-audio",
+    "Hienoa, ne ovat makeutusainetta. Käytän makeutusainetta joskus kahvissa. Yleensä juon kahvia ilman makeutusainetta tai sokeria.":
+      "m2q6true-audio",
+    "Se ei ole makeutusainetta. Makeutusaineet ovat teen vieressä.": "m2q6false-audio",
+
+    // Module 4 specific texts
+    "Kahvilan seinä on vihreä.": "m4q1-audio",
+    "Palaute oikea! Kahvilan seinä ei ole vihreä, vaan keltainen.": "m4q1c-audio",
+    "Väärä vastaus. Kahvilan seinä ei ole vihreä, vaan keltainen.": "m4q1i-audio",
+    "Pöydällä on keltaista mehua.": "m4q2-audio",
+    "Palaute oikea! Pöydällä on keltaista mehua. Se on ehkä appelsiinimehua.": "m4q2c-audio",
+    "Väärä vastaus. Pöydällä on keltaista mehua. Se on ehkä appelsiinimehua.": "m4q2i-audio",
+    "Asiakas voi ottaa kahvia kahviautomaatista.": "m4q3-audio",
+    "Palaute oikea! Kahvi on pöydällä kahvitermoksessa, ei automaatissa.": "m4q3c-audio",
+    "Väärä vastaus. Kahvi on pöydällä kahvitermoksessa, ei automaatissa.": "m4q3i-audio",
+    "Asiakas voi saada kakkua ja keksejä.": "m4q4-audio",
+    "Palaute oikea! Pöydällä on vaaleita keksejä ja tummaa kakkua. Se on ehkä suklaakakkua.": "m4q4c-audio",
+    "Väärä vastaus. Pöydällä on vaaleita keksejä ja tummaa kakkua. Se on ehkä suklaakakkua.": "m4q4i-audio",
+    "Kaikki lasit ovat pöydällä.": "m4q5-audio",
+    "Väärä vastaus. Lasit ovat hyllyllä, pöydän yläpuolella.": "m4q5i-audio",
+    "Palaute oikea! Lasit ovat hyllyllä, pöydän yläpuolella.": "m4q5c-audio",
+    "Kahvitermoksen takana on koriste-esine.": "m4q6-audio",
+    "Palaute oikea! Kahvitermoksen takana on kaunis patsas.": "m4q6c-audio",
+    "Väärä vastaus. Kahvitermoksen takana on kaunis patsas.": "m4q6i-audio",
+  }
+
+  // Check for exact text match first
+  if (textToAudioMap[text]) {
+    audioId = textToAudioMap[text]
+  }
+  // Check if this is a module-specific audio call (fallback for dynamic content)
+  else if (isModule2Context() && currentModule2Question !== undefined) {
+    const question = questions[currentModule2Question]
+    if (text === question.correctFeedback) {
+      audioId = `m2q${currentModule2Question + 1}true-audio`
+    } else if (text === question.incorrectFeedback) {
+      audioId = `m2q${currentModule2Question + 1}false-audio`
+    } else if (text === question.text) {
+      audioId = `m2q${currentModule2Question + 1}-audio`
+    }
+  } else if (isModule4Context() && currentModule4Question !== undefined) {
+    const question = trueFalseQuestions[currentModule4Question]
+    if (text === question.correctFeedback) {
+      audioId = `m4q${currentModule4Question + 1}c-audio`
+    } else if (text === question.incorrectFeedback) {
+      audioId = `m4q${currentModule4Question + 1}i-audio`
+    } else if (text === question.statement) {
+      audioId = `m4q${currentModule4Question + 1}-audio`
+    }
+  }
+
+  // If no module-specific mapping found, use default conversion
+  if (!audioId) {
+    audioId = text.toLowerCase().replace(/\s+/g, "-") + "-audio"
+  }
+
+  const audioElement = document.getElementById(audioId)
+
+  // If MP3 file exists, play it instead of using TTS
+  if (audioElement) {
+    console.log("Playing MP3 file:", audioId)
+    audioElement.currentTime = 0 // Reset to beginning
+    audioElement.play().catch((error) => {
+      console.log("MP3 playback failed, falling back to TTS:", error)
+      // Fall back to TTS if MP3 fails
+      fallbackToTTS(text)
+    })
+    return
+  }
+
+  // No MP3 found, use TTS fallback
+  console.log("No MP3 found for:", text, "- using TTS")
+  fallbackToTTS(text)
+}
+
+// Renamed from useTTSFallback to fallbackToTTS to avoid lint error
+function fallbackToTTS(text) {
   if ("speechSynthesis" in window) {
     const speakWithFinnishVoice = () => {
       const utterance = new SpeechSynthesisUtterance(text)
@@ -277,12 +381,21 @@ function convertToPhoneticFinnish(text) {
   return phoneticResult
 }
 
-// Stop current speech function
 function stopCurrentSpeech() {
+  // Stop TTS
   if (speechSynthesis.speaking) {
     speechSynthesis.cancel()
   }
   currentSpeechUtterance = null
+
+  // Stop all currently playing audio elements
+  const audioElements = document.querySelectorAll("audio")
+  audioElements.forEach((audio) => {
+    if (!audio.paused) {
+      audio.pause()
+      audio.currentTime = 0
+    }
+  })
 }
 
 // Module 2 variables
@@ -358,8 +471,32 @@ function handleModule2Feedback() {
     if (currentModule2Question < questions.length - 1) {
       nextModule2Question()
     } else {
-      // Module 2 completed, go directly to Module 3
-      showModule("moduuli3")
+      const feedbackElement = document.getElementById("module2-feedback")
+      const feedbackText = document.getElementById("module2-feedback-text")
+      const feedbackBtn = document.getElementById("module2-feedback-btn")
+
+      feedbackElement.className = "module2-feedback completion"
+      feedbackText.textContent =
+        "Hienoa! Löysit kuvasta kaikki tärkeät kahvilan tavarat. Opiskele sanat hyvin, koska tarvitset niitä varmasti myöhemmin!"
+      feedbackBtn.textContent = "Seuraava >"
+      feedbackElement.style.display = "block"
+
+      // Play completion message
+      speakFinnishWord(
+        "Hienoa! Löysit kuvasta kaikki tärkeät kahvilan tavarat. Opiskele sanat hyvin, koska tarvitset niitä varmasti myöhemmin!",
+      )
+
+      feedbackBtn.onclick = (e) => {
+        e.preventDefault()
+        console.log("Completion button clicked - navigating to Module 3")
+
+        // Hide the feedback first
+        feedbackElement.style.display = "none"
+
+        // Navigate directly to module 3
+        console.log("Navigating to Module 3...")
+        showModule("moduuli3")
+      }
     }
   }
 }
@@ -489,8 +626,16 @@ function checkVocabularyAnswers() {
 function playAudio(audioId) {
   const audio = document.getElementById(audioId)
   if (audio) {
-    audio.play()
+    console.log("Playing audio element:", audioId)
+    audio.currentTime = 0 // Reset to beginning
+    audio.play().catch((error) => {
+      console.log("Audio playback failed, falling back to TTS:", error)
+      // Use enhanced Finnish speech synthesis as fallback
+      const word = audioId.replace("-audio", "")
+      speakFinnishWord(word)
+    })
   } else {
+    console.log("Audio element not found:", audioId, "- using TTS")
     // Use enhanced Finnish speech synthesis as fallback
     const word = audioId.replace("-audio", "")
     speakFinnishWord(word)
@@ -722,6 +867,8 @@ function showPage(pageId) {
 
 // Function to show a specific module section
 function showModule(sectionId) {
+  console.log("showModule called with:", sectionId) // Added debugging
+
   // Show the learning modules page first
   showPage("learning-modules")
 
@@ -729,12 +876,15 @@ function showModule(sectionId) {
   const sections = document.querySelectorAll(".module-section")
   sections.forEach((section) => {
     section.classList.remove("active")
+    section.style.display = "none"
   })
 
   // Show the selected section
   const selectedSection = document.getElementById(sectionId)
   if (selectedSection) {
+    console.log("Found section:", sectionId) // Added debugging
     selectedSection.classList.add("active")
+    selectedSection.style.display = "block"
     currentModuleSection = sectionId
 
     // Update sidebar
@@ -748,6 +898,14 @@ function showModule(sectionId) {
     if (moduleItems[moduleIndex]) {
       moduleItems[moduleIndex].classList.add("active")
     }
+
+    // Special handling for module 3 - ensure first exercise is active
+    if (sectionId === "moduuli3") {
+      console.log("Setting up Module 3...")
+      showExercise("A")
+    }
+  } else {
+    console.log("Section not found:", sectionId)
   }
 }
 
@@ -824,4 +982,14 @@ function navigateModule(direction) {
       showPage("oppimispolku")
     }
   }
+}
+
+function isModule2Context() {
+  const module2Element = document.getElementById("moduuli2")
+  return module2Element && module2Element.style.display !== "none"
+}
+
+function isModule4Context() {
+  const module4Element = document.getElementById("moduuli4")
+  return module4Element && module4Element.style.display !== "none"
 }
