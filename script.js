@@ -3,7 +3,7 @@ let currentPage = "etusivu"
 let currentModuleSection = "moduuli1"
 const currentQuestion = 0
 let selectedVerb = ""
-let currentLanguage = "fi"
+const currentLanguage = "fi"
 const matchedWords = []
 let currentVocabItem = null
 let currentExercise = "A"
@@ -71,38 +71,38 @@ const trueFalseQuestions = [
   {
     statement: "Kahvilan seinä on vihreä.",
     correct: false,
-    correctFeedback: "Oikein! Kahvilan seinä ei ole vihreä, vaan keltainen.",
-    incorrectFeedback: "Väärin. Kahvilan seinä ei ole vihreä, vaan keltainen.",
+    correctFeedback: "Palaute oikea! Kahvilan seinä ei ole vihreä, vaan keltainen.",
+    incorrectFeedback: "Väärä vastaus. Kahvilan seinä ei ole vihreä, vaan keltainen.",
   },
   {
     statement: "Pöydällä on keltaista mehua.",
     correct: true,
-    correctFeedback: "Oikein! Pöydällä on keltaista mehua. Se on ehkä appelsiinimehua.",
-    incorrectFeedback: "Väärin. Pöydällä on keltaista mehua. Se on ehkä appelsiinimehua.",
+    correctFeedback: "Palaute oikea! Pöydällä on keltaista mehua. Se on ehkä appelsiinimehua.",
+    incorrectFeedback: "Väärä vastaus. Pöydällä on keltaista mehua. Se on ehkä appelsiinimehua.",
   },
   {
     statement: "Asiakas voi ottaa kahvia kahviautomaatista.",
     correct: false,
-    correctFeedback: "Oikein! Kahvi on pöydällä kahvitermoksessa, ei automaatissa.",
-    incorrectFeedback: "Väärin. Kahvi on pöydällä kahvitermoksessa, ei automaatissa.",
+    correctFeedback: "Palaute oikea! Kahvi on pöydällä kahvitermoksessa, ei automaatissa.",
+    incorrectFeedback: "Väärä vastaus. Kahvi on pöydällä kahvitermoksessa, ei automaatissa.",
   },
   {
     statement: "Asiakas voi saada kakkua ja keksejä.",
     correct: true,
-    correctFeedback: "Oikein! Pöydällä on vaaleita keksejä ja tummaa kakkua. Se on ehkä suklaakakkua.",
-    incorrectFeedback: "Väärin. Pöydällä on vaaleita keksejä ja tummaa kakkua. Se on ehkä suklaakakkua.",
+    correctFeedback: "Palaute oikea! Pöydällä on vaaleita keksejä ja tummaa kakkua. Se on ehkä suklaakakkua.",
+    incorrectFeedback: "Väärä vastaus. Pöydällä on vaaleita keksejä ja tummaa kakkua. Se on ehkä suklaakakkua.",
   },
   {
     statement: "Kaikki lasit ovat pöydällä.",
     correct: false,
-    correctFeedback: "Oikein! Lasit ovat hyllyllä, pöydän yläpuolella.",
-    incorrectFeedback: "Väärin. Lasit ovat hyllyllä, pöydän yläpuolella.",
+    correctFeedback: "Palaute oikea! Lasit ovat hyllyllä, pöydän yläpuolella.",
+    incorrectFeedback: "Väärä vastaus. Lasit ovat hyllyllä, pöydän yläpuolella.",
   },
   {
     statement: "Kahvitermoksen takana on koriste-esine.",
     correct: true,
-    correctFeedback: "Oikein! Kahvitermoksen takana on kaunis patsas.",
-    incorrectFeedback: "Väärin. Kahvitermoksen takana on kaunis patsas.",
+    correctFeedback: "Palaute oikea! Kahvitermoksen takana on kaunis patsas.",
+    incorrectFeedback: "Väärä vastaus. Kahvitermoksen takana on kaunis patsas.",
   },
 ]
 
@@ -118,27 +118,307 @@ const vocabularyItems = [
   "makeutusaine",
 ]
 
-// Add Finnish pronunciation for each word
-const finnishPronunciation = {
-  hunaja: "HU-na-ja",
-  sokeri: "SO-ke-ri",
-  juomalasit: "JUO-ma-la-sit",
-  teepussit: "TEE-pus-sit",
-  kahvitermos: "KAH-vi-ter-mos",
-  kakkupalat: "KAK-ku-pa-lat",
-  vedenkeitin: "VE-den-kei-tin",
-  kahviautomaatti: "KAH-vi-au-to-maat-ti",
-  makeutusaine: "MA-keu-tus-ai-ne",
+// Advanced Finnish Speech System with Native Pronunciation
+let currentSpeechUtterance = null
+let voicesLoaded = false
+let selectedFinnishVoice = null
+let usePhoneticFallback = false
+
+// Finnish phonetic conversion dictionary for non-Finnish voices
+const finnishPhoneticMap = {
+  // Finnish special characters to phonetic approximations
+  ä: "ae",
+  ö: "oe",
+  y: "ue",
+  Ä: "Ae",
+  Ö: "Oe",
+  Y: "Ue",
+
+  // Common Finnish word patterns for better pronunciation
+  kahvi: "kah-vee",
+  kahvia: "kah-vee-ah",
+  kahviautomaatti: "kah-vee-ah-oo-toh-mah-tee",
+  kahvitermos: "kah-vee-ter-mohs",
+  vedenkeitin: "veh-den-kay-tin",
+  hunaja: "hoo-nah-yah",
+  sokeri: "soh-keh-ree",
+  juomalasit: "yoo-oh-mah-lah-sit",
+  teepussit: "teh-eh-poos-sit",
+  kakkupalat: "kahk-koo-pah-laht",
+  makeutusaine: "mah-keh-oo-toos-ah-ee-neh",
+  termos: "ter-mohs",
+  keitin: "kay-tin",
+  pussit: "poos-sit",
+  palat: "pah-laht",
+  lasit: "lah-sit",
+  automaatti: "ah-oo-toh-mah-tee",
+
+  // Common Finnish phrases
+  hei: "hay",
+  kyllä: "kuel-lae",
+  joo: "yoh",
+  missä: "mis-sae",
+  tämä: "tae-mae",
+  mukava: "moo-kah-vah",
+  kahvila: "kah-vee-lah",
+  itsepalvelu: "it-seh-pahl-veh-loo",
+  tarkoittaa: "tar-koh-it-tah",
+  voit: "voh-it",
+  ottaa: "oht-tah",
+  itse: "it-seh",
+  kuvassa: "koo-vahs-sah",
+  paljon: "pahl-yohn",
+  kaikkea: "kah-ik-keh-ah",
+  sellaista: "sel-lah-is-tah",
+  tarvitset: "tar-vit-set",
+  etsi: "et-see",
+  minulle: "mee-nool-leh",
+  seuraavat: "seh-oo-rah-vaht",
+  tavarat: "tah-vah-raht",
+  ensin: "en-sin",
+  helppo: "help-poh",
+  sana: "sah-nah",
+  valkoinen: "vahl-koh-ee-nen",
+  merkki: "merk-kee",
+  hyödyllinen: "hueh-oel-li-nen",
+  koska: "kohs-kah",
+  keittää: "kay-tae",
+  sillä: "sil-lae",
+  kuumaa: "koo-mah",
+  vettä: "vet-tae",
+  nopeasti: "noh-peh-ahs-ti",
+  kaksi: "kahk-see",
+  termoksessa: "ter-mohk-ses-sah",
+  löydätkö: "loeh-daet-koeh",
+  vedenkeittimen: "veh-den-kay-ti-men",
+  lähellä: "lae-hel-lae",
+  löysit: "loeh-sit",
+  pulloa: "pool-loh-ah",
+  käytän: "kaeh-taen",
+  juon: "yoo-ohn",
+  lopuksi: "loh-pook-see",
+  viisi: "vee-see",
+  purkkia: "poork-kee-ah",
+  hienoa: "hee-eh-noh-ah",
+  joskus: "yohs-koos",
+  yleensä: "ue-len-sae",
+  ilman: "il-mahn",
+  kaikki: "kah-ik-kee",
+  tärkeät: "taer-keh-aet",
+  opiskele: "oh-pis-keh-leh",
+  hyvin: "hue-vin",
+  varmasti: "var-mahs-ti",
+  myöhemmin: "mueh-hem-min",
 }
 
-// Function to speak Finnish words
-function speakFinnishWord(word) {
-  if ("speechSynthesis" in window) {
-    const utterance = new SpeechSynthesisUtterance(word)
-    utterance.lang = "fi-FI"
-    utterance.rate = 0.8
-    speechSynthesis.speak(utterance)
+// Convert Finnish text to phonetic approximation
+function convertToFinnishPhonetic(text) {
+  let phoneticText = text.toLowerCase()
+
+  // Apply word-specific conversions first (more specific)
+  for (const [finnish, phonetic] of Object.entries(finnishPhoneticMap)) {
+    const regex = new RegExp(finnish, "gi")
+    phoneticText = phoneticText.replace(regex, phonetic)
   }
+
+  // Apply general Finnish pronunciation rules
+  phoneticText = phoneticText
+    // Double consonants (important in Finnish)
+    .replace(/kk/g, "k-k")
+    .replace(/ll/g, "l-l")
+    .replace(/nn/g, "n-n")
+    .replace(/pp/g, "p-p")
+    .replace(/ss/g, "s-s")
+    .replace(/tt/g, "t-t")
+
+    // Finnish vowel combinations
+    .replace(/ai/g, "ah-ee")
+    .replace(/ei/g, "eh-ee")
+    .replace(/oi/g, "oh-ee")
+    .replace(/ui/g, "oo-ee")
+    .replace(/yi/g, "ue-ee")
+    .replace(/au/g, "ah-oo")
+    .replace(/eu/g, "eh-oo")
+    .replace(/ou/g, "oh-oo")
+
+    // Add slight pauses for better pronunciation
+    .replace(/\s+/g, " ... ")
+
+  console.log(`Phonetic conversion: "${text}" -> "${phoneticText}"`)
+  return phoneticText
+}
+
+// Initialize Finnish voice system
+function initializeFinnishVoiceSystem() {
+  if (!("speechSynthesis" in window)) {
+    console.log("Speech synthesis not supported")
+    return
+  }
+
+  const loadFinnishVoices = () => {
+    const voices = speechSynthesis.getVoices()
+
+    if (voices.length > 0) {
+      console.log(`Total voices available: ${voices.length}`)
+
+      // Find Finnish voices with strict criteria
+      const finnishVoices = voices.filter((voice) => {
+        const lang = voice.lang.toLowerCase()
+        const name = voice.name.toLowerCase()
+
+        return (
+          lang === "fi-fi" ||
+          lang === "fi" ||
+          lang.startsWith("fi-") ||
+          name.includes("finnish") ||
+          name.includes("suomi") ||
+          name.includes("finland")
+        )
+      })
+
+      console.log(`Native Finnish voices found: ${finnishVoices.length}`)
+
+      if (finnishVoices.length > 0) {
+        // Always select the FIRST available Finnish voice (no randomness)
+        selectedFinnishVoice = finnishVoices[0]
+        usePhoneticFallback = false
+        console.log(`✅ Selected native Finnish voice: ${selectedFinnishVoice.name} (${selectedFinnishVoice.lang})`)
+      } else {
+        // No Finnish voices - use phonetic fallback with best available voice
+        console.log("❌ No native Finnish voices found")
+
+        // Find the best fallback voice (prefer European voices)
+        const europeanVoices = voices.filter((voice) => {
+          const lang = voice.lang.toLowerCase()
+          return (
+            lang.startsWith("sv-") || // Swedish
+            lang.startsWith("no-") || // Norwegian
+            lang.startsWith("da-") || // Danish
+            lang.startsWith("de-") || // German
+            lang.startsWith("nl-") || // Dutch
+            lang.startsWith("en-gb") // British English (better for European sounds)
+          )
+        })
+
+        if (europeanVoices.length > 0) {
+          selectedFinnishVoice = europeanVoices[0]
+          console.log(`🔄 Using European fallback voice: ${selectedFinnishVoice.name} (${selectedFinnishVoice.lang})`)
+        } else {
+          // Last resort: use any available voice
+          selectedFinnishVoice = voices[0]
+          console.log(`⚠️ Using default fallback voice: ${selectedFinnishVoice.name} (${selectedFinnishVoice.lang})`)
+        }
+
+        usePhoneticFallback = true
+        console.log("🔤 Phonetic fallback system activated")
+      }
+
+      voicesLoaded = true
+    }
+  }
+
+  // Load voices immediately
+  loadFinnishVoices()
+
+  // Listen for voice changes
+  speechSynthesis.addEventListener("voiceschanged", loadFinnishVoices)
+
+  // Force load with timeouts for different browsers
+  setTimeout(loadFinnishVoices, 100)
+  setTimeout(loadFinnishVoices, 500)
+  setTimeout(loadFinnishVoices, 1000)
+  setTimeout(loadFinnishVoices, 2000)
+}
+
+// Main Finnish speech function with native pronunciation guarantee
+function speakFinnishWord(text) {
+  console.log("🎤 Speaking Finnish:", text)
+
+  // Always stop any current speech first
+  stopCurrentSpeech()
+
+  if (!("speechSynthesis" in window)) {
+    console.log("❌ Speech synthesis not supported")
+    return
+  }
+
+  // Ensure voices are loaded
+  if (!voicesLoaded) {
+    console.log("⏳ Voices not loaded yet, initializing...")
+    initializeFinnishVoiceSystem()
+    setTimeout(() => speakFinnishWord(text), 800)
+    return
+  }
+
+  if (!selectedFinnishVoice) {
+    console.log("❌ No voice selected")
+    return
+  }
+
+  try {
+    // Determine text to speak
+    let textToSpeak = text
+
+    if (usePhoneticFallback) {
+      textToSpeak = convertToFinnishPhonetic(text)
+      console.log("🔤 Using phonetic fallback")
+    } else {
+      console.log("🇫🇮 Using native Finnish voice")
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak)
+
+    // ALWAYS set Finnish language regardless of voice
+    utterance.lang = "fi-FI"
+
+    // Optimize settings for Finnish pronunciation
+    utterance.rate = 0.75 // Slightly slower for clarity
+    utterance.pitch = 1.0
+    utterance.volume = 1.0
+
+    // Use the selected voice
+    utterance.voice = selectedFinnishVoice
+    console.log(`🔊 Using voice: ${selectedFinnishVoice.name} (${selectedFinnishVoice.lang})`)
+
+    // Event listeners
+    utterance.addEventListener("start", () => {
+      currentSpeechUtterance = utterance
+      console.log("▶️ Finnish speech started")
+    })
+
+    utterance.addEventListener("end", () => {
+      currentSpeechUtterance = null
+      console.log("⏹️ Finnish speech completed")
+    })
+
+    utterance.addEventListener("error", (event) => {
+      console.log("❌ Speech error:", event.error)
+      currentSpeechUtterance = null
+    })
+
+    // Speak with guaranteed Finnish pronunciation
+    speechSynthesis.speak(utterance)
+    currentSpeechUtterance = utterance
+  } catch (error) {
+    console.log("❌ Speech synthesis error:", error)
+    currentSpeechUtterance = null
+  }
+}
+
+// Enhanced stop function
+function stopCurrentSpeech() {
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel()
+  }
+  if (currentSpeechUtterance) {
+    currentSpeechUtterance = null
+  }
+  // Additional safety delay
+  setTimeout(() => {
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel()
+    }
+  }, 50)
 }
 
 // Module 2 variables
@@ -170,9 +450,54 @@ function updateModule2Question() {
   document.getElementById("module2-feedback").style.display = "none"
 }
 
+// Enhanced function to check Module 2 clickable answers with Finnish voice feedback
+function checkModule2Answer(item) {
+  const currentQuestion = questions[currentModule2Question]
+
+  if (currentQuestion.type !== "question") {
+    return
+  }
+
+  const feedbackElement = document.getElementById("module2-feedback")
+  const feedbackText = document.getElementById("module2-feedback-text")
+  const feedbackBtn = document.getElementById("module2-feedback-btn")
+
+  if (item === currentQuestion.item) {
+    // Correct answer
+    feedbackElement.className = "module2-feedback correct"
+    feedbackText.textContent = currentQuestion.correctFeedback
+    feedbackBtn.textContent = "Seuraava kysymys"
+    // Play Finnish voice for correct feedback
+    speakFinnishWord(currentQuestion.correctFeedback)
+  } else {
+    // Wrong answer
+    feedbackElement.className = "module2-feedback incorrect"
+    feedbackText.textContent = currentQuestion.incorrectFeedback
+    feedbackBtn.textContent = "Yritä uudelleen"
+    // Play Finnish voice for incorrect feedback
+    speakFinnishWord(currentQuestion.incorrectFeedback)
+  }
+
+  feedbackElement.style.display = "block"
+}
+
 function handleModule2Feedback() {
-  document.getElementById("module2-feedback").style.display = "none"
-  nextModule2Question()
+  const feedbackBtn = document.getElementById("module2-feedback-btn")
+
+  if (feedbackBtn.textContent === "Yritä uudelleen") {
+    // Hide feedback and let user try again
+    document.getElementById("module2-feedback").style.display = "none"
+  } else {
+    // Move to next question
+    document.getElementById("module2-feedback").style.display = "none"
+
+    if (currentModule2Question < questions.length - 1) {
+      nextModule2Question()
+    } else {
+      // Module 2 completed, go directly to Module 3
+      showModule("moduuli3")
+    }
+  }
 }
 
 // Module 4 variables
@@ -193,13 +518,16 @@ function answerModule4Question(answer) {
   if (isCorrect) {
     feedbackElement.className = "module4-feedback correct"
     feedbackText.textContent = question.correctFeedback
+    // Play Finnish voice for correct feedback
+    speakFinnishWord(question.correctFeedback)
   } else {
     feedbackElement.className = "module4-feedback incorrect"
     feedbackText.textContent = question.incorrectFeedback
+    // Play Finnish voice for incorrect feedback
+    speakFinnishWord(question.incorrectFeedback)
   }
 
   feedbackElement.style.display = "block"
-  speakFinnishWord(isCorrect ? question.correctFeedback : question.incorrectFeedback)
 }
 
 function handleModule4Feedback() {
@@ -209,10 +537,8 @@ function handleModule4Feedback() {
     currentModule4Question++
     updateModule4Question()
   } else {
-    // Module 4 completed, show completion message
-    setTimeout(() => {
-      alert("Hienoa! Olet suorittanut kaikki moduulit!")
-    }, 500)
+    // Last question completed, go directly to feedback page
+    showPage("palautetta")
   }
 }
 
@@ -227,37 +553,255 @@ function updateModule4Question() {
     `${currentModule4Question + 1} / ${trueFalseQuestions.length}`
 }
 
-// Function to check Module 2 clickable answers
-function checkModule2Answer(item) {
-  const currentQuestion = questions[currentModule2Question]
+// Enhanced function to set up vocabulary matching with proper green background logic
+function setupVocabularyMatching() {
+  const wordBubbles = document.querySelectorAll(".word-bubble")
+  const imageContainers = document.querySelectorAll(".vocab-image-container-large")
 
-  if (currentQuestion.type !== "question") {
-    return
-  }
+  // Add click handlers to word bubbles
+  wordBubbles.forEach((bubble) => {
+    bubble.addEventListener("click", function () {
+      const word = this.getAttribute("data-word")
+      if (!word) return
 
-  const feedbackElement = document.getElementById("module2-feedback")
-  const feedbackText = document.getElementById("module2-feedback-text")
-  const feedbackBtn = document.getElementById("module2-feedback-btn")
+      // Play Finnish pronunciation
+      speakFinnishWord(word)
 
-  if (item === currentQuestion.item) {
-    feedbackElement.className = "module2-feedback correct"
-    feedbackText.textContent = currentQuestion.correctFeedback
-    feedbackBtn.textContent = "Seuraava kysymys"
-    speakFinnishWord(currentQuestion.correctFeedback)
+      // Show the word text and hide other elements
+      this.classList.add("revealed")
+
+      // Remove previous selections
+      wordBubbles.forEach((b) => b.classList.remove("selected"))
+
+      // Select this bubble
+      this.classList.add("selected")
+      currentVocabItem = word
+    })
+  })
+
+  // Add click handlers to images
+  imageContainers.forEach((container) => {
+    container.addEventListener("click", function () {
+      if (currentVocabItem) {
+        const imageWord = this.getAttribute("data-word")
+
+        if (imageWord === currentVocabItem) {
+          // Correct match - add green background
+          this.classList.add("matched")
+          if (!matchedWords.includes(currentVocabItem)) {
+            matchedWords.push(currentVocabItem)
+          }
+
+          // Reset selection
+          wordBubbles.forEach((b) => b.classList.remove("selected"))
+          currentVocabItem = null
+
+          // Don't automatically go to Module 2 - wait for "✓ Tarkista" button
+        } else {
+          // Wrong match - no green background, show feedback
+          alert("Väärin. Yritä uudelleen.")
+        }
+      } else {
+        alert("Valitse ensin sana klikkaamalla puhekuplaa.")
+      }
+    })
+  })
+}
+
+// Function to check vocabulary answers - go directly to Module 2 only when clicking "✓ Tarkista"
+function checkVocabularyAnswers() {
+  const matchedCount = matchedWords.length
+  const totalCount = vocabularyItems.length
+
+  if (matchedCount === totalCount) {
+    // Go directly to Module 2
+    showPage("moduuli2-start")
   } else {
-    feedbackElement.className = "module2-feedback incorrect"
-    feedbackText.textContent = currentQuestion.incorrectFeedback
-    feedbackBtn.textContent = "Yritä uudelleen"
-    speakFinnishWord(currentQuestion.incorrectFeedback)
+    alert(`Olet yhdistänyt ${matchedCount}/${totalCount} sanaa oikein. Jatka harjoittelua!`)
+  }
+}
+
+// Function to play audio with enhanced Finnish pronunciation
+function playAudio(audioId) {
+  const audio = document.getElementById(audioId)
+  if (audio) {
+    audio.play()
+  } else {
+    // Use enhanced Finnish speech synthesis as fallback
+    const word = audioId.replace("-audio", "")
+    speakFinnishWord(word)
+  }
+}
+
+// Function to show exercise tabs in Module 3
+function showExercise(exercise) {
+  currentExercise = exercise
+
+  // Update tab buttons
+  const tabButtons = document.querySelectorAll(".tab-button")
+  tabButtons.forEach((button) => {
+    button.classList.remove("active")
+  })
+
+  // Find and activate the clicked tab
+  const activeTab = document.querySelector(`[onclick="showExercise('${exercise}')"]`)
+  if (activeTab) {
+    activeTab.classList.add("active")
   }
 
-  feedbackElement.style.display = "block"
+  // Hide all exercise sections
+  const exerciseSections = document.querySelectorAll(".exercise-section")
+  exerciseSections.forEach((section) => {
+    section.classList.remove("active")
+  })
+
+  // Show the selected exercise section
+  const selectedSection = document.getElementById(`exercise-${exercise.toLowerCase()}`)
+  if (selectedSection) {
+    selectedSection.classList.add("active")
+  }
+}
+
+// Function to set up matching exercises
+function setupMatchingExercises() {
+  const matchingItems = document.querySelectorAll(".matching-item")
+  const matchingSlots = document.querySelectorAll(".matching-slot")
+
+  let selectedItem = null
+
+  matchingItems.forEach((item) => {
+    item.addEventListener("click", function () {
+      // Remove previous selections
+      matchingItems.forEach((i) => i.classList.remove("selected"))
+
+      // Select this item
+      this.classList.add("selected")
+      selectedItem = this
+    })
+  })
+
+  matchingSlots.forEach((slot) => {
+    slot.addEventListener("click", function () {
+      if (selectedItem) {
+        const itemId = selectedItem.getAttribute("data-id")
+        const slotMatch = this.getAttribute("data-match")
+
+        if (itemId === slotMatch) {
+          // Correct match
+          selectedItem.classList.add("matched")
+          selectedItem.classList.remove("selected")
+          this.classList.add("matched")
+          selectedItem = null
+        } else {
+          // Wrong match
+          alert("Väärin. Yritä uudelleen.")
+        }
+      } else {
+        alert("Valitse ensin lause vasemmalta puolelta.")
+      }
+    })
+  })
+}
+
+// Function to check matching answers - navigate to next exercise
+function checkMatchingAnswers(exerciseId) {
+  const currentExerciseElement = document.querySelector(".exercise-section.active")
+  const matchedItems = currentExerciseElement.querySelectorAll(".matching-item.matched")
+  const totalItems = currentExerciseElement.querySelectorAll(".matching-item")
+
+  if (matchedItems.length === totalItems.length) {
+    // All correct, move to next exercise
+    if (currentExercise === "A") {
+      showExercise("B")
+    } else if (currentExercise === "B") {
+      showExercise("C")
+    } else if (currentExercise === "C") {
+      // After C, go to Module 4
+      showModule("moduuli4")
+    }
+  } else {
+    alert("Jatka harjoittelua. Kaikki lauseet eivät ole vielä oikein yhdistetty.")
+  }
+}
+
+// Function to set up the fill-in exercise
+function setupFillInExercise() {
+  const verbOptions = document.querySelectorAll(".verb-option")
+  const blanks = document.querySelectorAll(".fill-in-blank")
+
+  verbOptions.forEach((option) => {
+    option.addEventListener("click", function () {
+      selectedVerb = this.textContent
+
+      // Remove selected class from all options
+      verbOptions.forEach((opt) => opt.classList.remove("selected"))
+
+      // Add selected class to the clicked option
+      this.classList.add("selected")
+    })
+  })
+
+  // Make blanks clickable
+  blanks.forEach((blank) => {
+    blank.addEventListener("click", function () {
+      if (selectedVerb) {
+        this.textContent = selectedVerb
+        this.classList.remove("incorrect")
+
+        if (this.dataset.correct === selectedVerb) {
+          this.classList.add("correct")
+        } else {
+          this.classList.add("incorrect")
+        }
+
+        selectedVerb = ""
+        verbOptions.forEach((opt) => opt.classList.remove("selected"))
+      }
+    })
+  })
+}
+
+// Function to select a verb for the fill-in exercise
+function selectVerb(verb) {
+  selectedVerb = verb
+
+  // Remove selected class from all options
+  const verbOptions = document.querySelectorAll(".verb-option")
+  verbOptions.forEach((opt) => opt.classList.remove("selected"))
+
+  // Add selected class to the clicked option
+  const selectedOption = Array.from(verbOptions).find((opt) => opt.textContent === verb)
+  if (selectedOption) {
+    selectedOption.classList.add("selected")
+  }
+}
+
+// Function to check fill-in answers - navigate to Module 4
+function checkFillInAnswers() {
+  const blanks = document.querySelectorAll(".fill-in-blank")
+  let allCorrect = true
+
+  blanks.forEach((blank) => {
+    if (blank.textContent === "[___________]" || blank.textContent !== blank.dataset.correct) {
+      allCorrect = false
+      blank.classList.add("incorrect")
+    } else {
+      blank.classList.add("correct")
+    }
+  })
+
+  if (allCorrect) {
+    // Go directly to Module 4
+    showPage("moduuli4")
+  } else {
+    alert("Tarkista vastaukset ja yritä uudelleen.")
+  }
 }
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", () => {
-  // Initialize language
-  updateLanguage(currentLanguage)
+  // Initialize Finnish voice system
+  initializeFinnishVoiceSystem()
 
   // Set up vocabulary matching
   setupVocabularyMatching()
@@ -267,40 +811,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Set up fill-in exercises
   setupFillInExercise()
-
-  // Set up Module 2 clickable image
-  setupModule2ClickableImage()
 })
-
-// Function to set up Module 2 clickable image
-function setupModule2ClickableImage() {
-  const image = document.getElementById("module2-clickable-image")
-  if (image) {
-    image.addEventListener("click", function (event) {
-      const rect = this.getBoundingClientRect()
-      const x = event.clientX - rect.left
-      const y = event.clientY - rect.top
-
-      // Define clickable areas (approximate coordinates)
-      const areas = {
-        kahviautomaatti: { x1: 50, y1: 100, x2: 200, y2: 300 },
-        vedenkeitin: { x1: 300, y1: 150, x2: 400, y2: 250 },
-        kahvitermos: { x1: 500, y1: 200, x2: 600, y2: 350 },
-        teepussit: { x1: 250, y1: 100, x2: 350, y2: 150 },
-        hunaja: { x1: 400, y1: 100, x2: 500, y2: 200 },
-        makeutusaine: { x1: 450, y1: 250, x2: 550, y2: 300 },
-      }
-
-      // Check which area was clicked
-      for (const [item, area] of Object.entries(areas)) {
-        if (x >= area.x1 && x <= area.x2 && y >= area.y1 && y <= area.y2) {
-          checkModule2Answer(item)
-          return
-        }
-      }
-    })
-  }
-}
 
 // Function to show a specific page
 function showPage(pageId) {
@@ -381,412 +892,75 @@ function showModule(sectionId) {
 
 // Function to navigate between modules
 function navigateModule(direction) {
-  const moduleOrder = ["moduuli1", "moduuli2", "moduuli3", "moduuli4"]
-  const currentIndex = moduleOrder.indexOf(currentModuleSection)
-
-  if (direction === "next" && currentIndex < moduleOrder.length - 1) {
-    showModule(moduleOrder[currentIndex + 1])
-  } else if (direction === "prev" && currentIndex > 0) {
-    showModule(moduleOrder[currentIndex - 1])
-  } else if (direction === "next" && currentIndex === moduleOrder.length - 1) {
-    // Go to feedback page after last module
-    showPage("palautetta")
-  } else if (direction === "prev" && currentIndex === 0) {
-    // Go back to learning path from first module
-    showPage("oppimispolku")
-  }
-}
-
-// Function to set up vocabulary matching
-function setupVocabularyMatching() {
-  const wordBubbles = document.querySelectorAll(".word-bubble")
-  const imageContainers = document.querySelectorAll(".vocab-image-container")
-
-  // Add click handlers to word bubbles
-  wordBubbles.forEach((bubble) => {
-    bubble.addEventListener("click", function () {
-      const word = this.getAttribute("data-word")
-      if (!word) return
-
-      // Play Finnish pronunciation
-      speakFinnishWord(word)
-
-      // Show the word text and hide other elements
-      this.classList.add("revealed")
-
-      // Remove previous selections
-      wordBubbles.forEach((b) => b.classList.remove("selected"))
-
-      // Select this bubble
-      this.classList.add("selected")
-      currentVocabItem = word
-    })
-  })
-
-  // Add click handlers to images
-  imageContainers.forEach((container) => {
-    container.addEventListener("click", function () {
-      if (currentVocabItem) {
-        const imageWord = this.getAttribute("data-word")
-
-        if (imageWord === currentVocabItem) {
-          // Correct match
-          this.classList.add("matched")
-          if (!matchedWords.includes(currentVocabItem)) {
-            matchedWords.push(currentVocabItem)
-          }
-
-          // Reset selection
-          wordBubbles.forEach((b) => b.classList.remove("selected"))
-          currentVocabItem = null
-
-          // Check if all matched
-          if (matchedWords.length === vocabularyItems.length) {
-            setTimeout(() => {
-              document.getElementById("module1-completion").style.display = "flex"
-            }, 500)
-          }
-        } else {
-          // Wrong match - show feedback
-          alert("Väärin. Yritä uudelleen.")
-        }
+  if (currentModuleSection === "moduuli2") {
+    // Navigate between Module 2 questions
+    if (direction === "next") {
+      if (currentModule2Question < questions.length - 1) {
+        nextModule2Question()
       } else {
-        alert("Valitse ensin sana klikkaamalla puhekuplaa.")
+        // Go to Module 3
+        showModule("moduuli3")
       }
-    })
-  })
-}
-
-// Function to check vocabulary answers
-function checkVocabularyAnswers() {
-  const matchedCount = matchedWords.length
-  const totalCount = vocabularyItems.length
-
-  if (matchedCount === totalCount) {
-    alert("Hienoa! Kaikki vastaukset ovat oikein!")
-    document.getElementById("module1-completion").style.display = "flex"
-  } else {
-    alert(`Olet yhdistänyt ${matchedCount}/${totalCount} sanaa oikein. Jatka harjoittelua!`)
-  }
-}
-
-// Function to play audio
-function playAudio(audioId) {
-  const audio = document.getElementById(audioId)
-  if (audio) {
-    audio.play()
-  } else {
-    // Use Finnish speech synthesis as fallback
-    const word = audioId.replace("-audio", "")
-    speakFinnishWord(word)
-  }
-}
-
-// Function to show exercise tabs in Module 3
-function showExercise(exercise) {
-  currentExercise = exercise
-
-  // Update tab buttons
-  const tabButtons = document.querySelectorAll(".tab-button")
-  tabButtons.forEach((button) => {
-    button.classList.remove("active")
-  })
-
-  // Find and activate the clicked tab
-  const activeTab = document.querySelector(`[onclick="showExercise('${exercise}')"]`)
-  if (activeTab) {
-    activeTab.classList.add("active")
-  }
-
-  // Hide all exercise sections
-  const exerciseSections = document.querySelectorAll(".exercise-section")
-  exerciseSections.forEach((section) => {
-    section.classList.remove("active")
-  })
-
-  // Show the selected exercise section
-  const selectedSection = document.getElementById(`exercise-${exercise.toLowerCase()}`)
-  if (selectedSection) {
-    selectedSection.classList.add("active")
-  }
-}
-
-// Function to set up matching exercises
-function setupMatchingExercises() {
-  const matchingItems = document.querySelectorAll(".matching-item")
-  const matchingSlots = document.querySelectorAll(".matching-slot")
-
-  let selectedItem = null
-
-  matchingItems.forEach((item) => {
-    item.addEventListener("click", function () {
-      // Remove previous selections
-      matchingItems.forEach((i) => i.classList.remove("selected"))
-
-      // Select this item
-      this.classList.add("selected")
-      selectedItem = this
-    })
-  })
-
-  matchingSlots.forEach((slot) => {
-    slot.addEventListener("click", function () {
-      if (selectedItem) {
-        const itemId = selectedItem.getAttribute("data-id")
-        const slotMatch = this.getAttribute("data-match")
-
-        if (itemId === slotMatch) {
-          // Correct match
-          selectedItem.classList.add("matched")
-          selectedItem.classList.remove("selected")
-          this.classList.add("matched")
-          selectedItem = null
-        } else {
-          // Wrong match
-          alert("Väärin. Yritä uudelleen.")
-        }
+    } else if (direction === "prev") {
+      if (currentModule2Question > 0) {
+        currentModule2Question--
+        updateModule2Question()
       } else {
-        alert("Valitse ensin lause vasemmalta puolelta.")
+        // Go to Module 1
+        showModule("moduuli1")
       }
-    })
-  })
-}
-
-// Function to check matching answers
-function checkMatchingAnswers(exerciseId) {
-  const matchedItems = document.querySelectorAll(`.matching-item.matched`)
-  const totalItems = document.querySelectorAll(`.matching-item`)
-
-  if (matchedItems.length === totalItems.length) {
-    alert("Hyvä! Olet yhdistänyt kaikki lauseet oikein.")
-  } else {
-    alert("Jatka harjoittelua. Kaikki lauseet eivät ole vielä oikein yhdistetty.")
-  }
-}
-
-// Function to set up the fill-in exercise
-function setupFillInExercise() {
-  const verbOptions = document.querySelectorAll(".verb-option")
-  const blanks = document.querySelectorAll(".fill-in-blank")
-
-  verbOptions.forEach((option) => {
-    option.addEventListener("click", function () {
-      selectedVerb = this.textContent
-
-      // Remove selected class from all options
-      verbOptions.forEach((opt) => opt.classList.remove("selected"))
-
-      // Add selected class to the clicked option
-      this.classList.add("selected")
-    })
-  })
-
-  // Make blanks clickable
-  blanks.forEach((blank) => {
-    blank.addEventListener("click", function () {
-      if (selectedVerb) {
-        this.textContent = selectedVerb
-        this.classList.remove("incorrect")
-
-        if (this.dataset.correct === selectedVerb) {
-          this.classList.add("correct")
-        } else {
-          this.classList.add("incorrect")
-        }
-
-        selectedVerb = ""
-        verbOptions.forEach((opt) => opt.classList.remove("selected"))
-      }
-    })
-  })
-}
-
-// Function to select a verb for the fill-in exercise
-function selectVerb(verb) {
-  selectedVerb = verb
-
-  // Remove selected class from all options
-  const verbOptions = document.querySelectorAll(".verb-option")
-  verbOptions.forEach((opt) => opt.classList.remove("selected"))
-
-  // Add selected class to the clicked option
-  const selectedOption = Array.from(verbOptions).find((opt) => opt.textContent === verb)
-  if (selectedOption) {
-    selectedOption.classList.add("selected")
-  }
-}
-
-// Function to check fill-in answers
-function checkFillInAnswers() {
-  const blanks = document.querySelectorAll(".fill-in-blank")
-  let allCorrect = true
-
-  blanks.forEach((blank) => {
-    if (blank.textContent === "[___________]" || blank.textContent !== blank.dataset.correct) {
-      allCorrect = false
-      blank.classList.add("incorrect")
-    } else {
-      blank.classList.add("correct")
     }
-  })
-
-  if (allCorrect) {
-    alert("Hienoa! Kaikki vastaukset ovat oikein!")
-  } else {
-    alert("Tarkista vastaukset ja yritä uudelleen.")
-  }
-}
-
-// Function to submit feedback and go to home page
-function submitFeedback(event) {
-  event.preventDefault()
-  alert("Kiitos palautteestasi!")
-  showPage("etusivu")
-}
-
-// Function to update progress bar in Module 4
-function updateProgressBar(currentQuestion, totalQuestions) {
-  const progressFill = document.querySelector(".progress-fill")
-  const progressCounter = document.querySelector(".progress-counter")
-
-  if (progressFill && progressCounter) {
-    const percentage = (currentQuestion / totalQuestions) * 100
-    progressFill.style.width = `${percentage}%`
-    progressCounter.textContent = `${currentQuestion} / ${totalQuestions}`
-  }
-}
-
-// Function to check true/false answer
-function checkTrueFalseAnswer(questionIndex, answer) {
-  const question = trueFalseQuestions[questionIndex]
-
-  // Update current question display
-  const currentTestQuestion = document.getElementById("current-test-question")
-  if (currentTestQuestion && questionIndex < trueFalseQuestions.length - 1) {
-    // Move to next question
-    const nextQuestion = trueFalseQuestions[questionIndex + 1]
-    currentTestQuestion.textContent = nextQuestion.statement
-
-    // Update progress
-    updateProgressBar(questionIndex + 2, trueFalseQuestions.length)
-  } else if (questionIndex === trueFalseQuestions.length - 1) {
-    // Last question completed
-    updateProgressBar(trueFalseQuestions.length, trueFalseQuestions.length)
-
-    // Show completion message
-    setTimeout(() => {
-      const completionMessage = document.getElementById("module4-completion")
-      if (completionMessage) {
-        completionMessage.style.display = "block"
-        completionMessage.textContent = "Hienoa! Olet suorittanut testin!"
+  } else if (currentModuleSection === "moduuli3") {
+    // Navigate between Module 3 exercises
+    if (direction === "next") {
+      if (currentExercise === "A") {
+        showExercise("B")
+      } else if (currentExercise === "B") {
+        showExercise("C")
+      } else if (currentExercise === "C") {
+        showModule("moduuli4")
       }
-    }, 1000)
-  }
+    } else if (direction === "prev") {
+      if (currentExercise === "C") {
+        showExercise("B")
+      } else if (currentExercise === "B") {
+        showExercise("A")
+      } else if (currentExercise === "A") {
+        showModule("moduuli2")
+      }
+    }
+  } else if (currentModuleSection === "moduuli4") {
+    // Navigate between Module 4 questions
+    if (direction === "next") {
+      if (currentModule4Question < trueFalseQuestions.length - 1) {
+        currentModule4Question++
+        updateModule4Question()
+      } else {
+        // Go to feedback page
+        showPage("palautetta")
+      }
+    } else if (direction === "prev") {
+      if (currentModule4Question > 0) {
+        currentModule4Question--
+        updateModule4Question()
+      } else {
+        // Go to Module 3
+        showModule("moduuli3")
+      }
+    }
+  } else {
+    // Default navigation between modules
+    const moduleOrder = ["moduuli1", "moduuli2", "moduuli3", "moduuli4"]
+    const currentIndex = moduleOrder.indexOf(currentModuleSection)
 
-  // Provide audio feedback
-  if (window.finnishVoice) {
-    const feedbackText = answer === question.correct ? question.correctFeedback : question.incorrectFeedback
-
-    setTimeout(() => {
-      window.finnishVoice.speak(feedbackText)
-    }, 500)
-  }
-}
-
-// Function to change language (only for feedback page)
-function changeLanguage(lang) {
-  // Only work on feedback page
-  if (currentPage !== "palautetta") return
-
-  currentLanguage = lang
-  updateFeedbackLanguage(lang)
-
-  // Update language toggle buttons only on feedback page
-  const feedbackPage = document.getElementById("palautetta")
-  if (feedbackPage) {
-    const langButtons = feedbackPage.querySelectorAll(".lang-btn")
-    langButtons.forEach((button) => {
-      button.classList.remove("active")
-    })
-
-    const activeButton = feedbackPage.querySelector(`.lang-btn[onclick="changeLanguage('${lang}')"]`)
-    if (activeButton) {
-      activeButton.classList.add("active")
+    if (direction === "next" && currentIndex < moduleOrder.length - 1) {
+      showModule(moduleOrder[currentIndex + 1])
+    } else if (direction === "prev" && currentIndex > 0) {
+      showModule(moduleOrder[currentIndex - 1])
+    } else if (direction === "next" && currentIndex === moduleOrder.length - 1) {
+      showPage("palautetta")
+    } else if (direction === "prev" && currentIndex === 0) {
+      showPage("oppimispolku")
     }
   }
-}
-
-// Function to update only feedback page language
-function updateFeedbackLanguage(lang) {
-  const feedbackTranslations = {
-    "feedback-title": {
-      fi: "Anna palautetta",
-      en: "Give Feedback",
-    },
-    "feedback-description": {
-      fi: "Arvostamme palautettasi oppimaterialeistamme. Kerro meille kokemuksistasi ja mahdollisista parannusehdotuksista.",
-      en: "We appreciate your feedback on our learning materials. Tell us about your experiences and possible improvement suggestions.",
-    },
-    "rating-question": {
-      fi: "Miten arvioisit kokemuksesi oppimaterialeistamme? *",
-      en: "How would you rate your experience with our learning materials? *",
-    },
-    excellent: {
-      fi: "Erinomainen",
-      en: "Excellent",
-    },
-    good: {
-      fi: "Hyvä",
-      en: "Good",
-    },
-    average: {
-      fi: "Keskinkertainen",
-      en: "Average",
-    },
-    poor: {
-      fi: "Huono",
-      en: "Poor",
-    },
-    "suggestions-question": {
-      fi: "Mitä voisimme parantaa?",
-      en: "What could we improve?",
-    },
-    "suggestions-placeholder": {
-      fi: "Kirjoita ehdotuksesi tähän...",
-      en: "Write your suggestions here...",
-    },
-    "submit-feedback": {
-      fi: "Lähetä palaute",
-      en: "Submit Feedback",
-    },
-  }
-
-  // Only update feedback page elements
-  const feedbackPage = document.getElementById("palautetta")
-  if (feedbackPage) {
-    const elements = feedbackPage.querySelectorAll("[data-translate]")
-    elements.forEach((element) => {
-      const key = element.getAttribute("data-translate")
-      if (feedbackTranslations[key] && feedbackTranslations[key][lang]) {
-        element.textContent = feedbackTranslations[key][lang]
-      }
-    })
-
-    const placeholderElements = feedbackPage.querySelectorAll("[data-translate-placeholder]")
-    placeholderElements.forEach((element) => {
-      const key = element.getAttribute("data-translate-placeholder")
-      if (feedbackTranslations[key] && feedbackTranslations[key][lang]) {
-        element.placeholder = feedbackTranslations[key][lang]
-      }
-    })
-  }
-}
-
-// Function to update all text elements based on language (only for non-feedback pages)
-function updateLanguage(lang) {
-  // Don't update language for other pages, keep them in Finnish
-  if (currentPage === "palautetta") {
-    updateFeedbackLanguage(lang)
-  }
-  // All other pages remain in Finnish
 }
