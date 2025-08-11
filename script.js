@@ -118,307 +118,171 @@ const vocabularyItems = [
   "makeutusaine",
 ]
 
-// Advanced Finnish Speech System with Native Pronunciation
+// Enhanced Finnish-only speech function with better cross-browser support
 let currentSpeechUtterance = null
-let voicesLoaded = false
-let selectedFinnishVoice = null
-let usePhoneticFallback = false
 
-// Finnish phonetic conversion dictionary for non-Finnish voices
-const finnishPhoneticMap = {
-  // Finnish special characters to phonetic approximations
-  ä: "ae",
-  ö: "oe",
-  y: "ue",
-  Ä: "Ae",
-  Ö: "Oe",
-  Y: "Ue",
-
-  // Common Finnish word patterns for better pronunciation
-  kahvi: "kah-vee",
-  kahvia: "kah-vee-ah",
-  kahviautomaatti: "kah-vee-ah-oo-toh-mah-tee",
-  kahvitermos: "kah-vee-ter-mohs",
-  vedenkeitin: "veh-den-kay-tin",
-  hunaja: "hoo-nah-yah",
-  sokeri: "soh-keh-ree",
-  juomalasit: "yoo-oh-mah-lah-sit",
-  teepussit: "teh-eh-poos-sit",
-  kakkupalat: "kahk-koo-pah-laht",
-  makeutusaine: "mah-keh-oo-toos-ah-ee-neh",
-  termos: "ter-mohs",
-  keitin: "kay-tin",
-  pussit: "poos-sit",
-  palat: "pah-laht",
-  lasit: "lah-sit",
-  automaatti: "ah-oo-toh-mah-tee",
-
-  // Common Finnish phrases
-  hei: "hay",
-  kyllä: "kuel-lae",
-  joo: "yoh",
-  missä: "mis-sae",
-  tämä: "tae-mae",
-  mukava: "moo-kah-vah",
-  kahvila: "kah-vee-lah",
-  itsepalvelu: "it-seh-pahl-veh-loo",
-  tarkoittaa: "tar-koh-it-tah",
-  voit: "voh-it",
-  ottaa: "oht-tah",
-  itse: "it-seh",
-  kuvassa: "koo-vahs-sah",
-  paljon: "pahl-yohn",
-  kaikkea: "kah-ik-keh-ah",
-  sellaista: "sel-lah-is-tah",
-  tarvitset: "tar-vit-set",
-  etsi: "et-see",
-  minulle: "mee-nool-leh",
-  seuraavat: "seh-oo-rah-vaht",
-  tavarat: "tah-vah-raht",
-  ensin: "en-sin",
-  helppo: "help-poh",
-  sana: "sah-nah",
-  valkoinen: "vahl-koh-ee-nen",
-  merkki: "merk-kee",
-  hyödyllinen: "hueh-oel-li-nen",
-  koska: "kohs-kah",
-  keittää: "kay-tae",
-  sillä: "sil-lae",
-  kuumaa: "koo-mah",
-  vettä: "vet-tae",
-  nopeasti: "noh-peh-ahs-ti",
-  kaksi: "kahk-see",
-  termoksessa: "ter-mohk-ses-sah",
-  löydätkö: "loeh-daet-koeh",
-  vedenkeittimen: "veh-den-kay-ti-men",
-  lähellä: "lae-hel-lae",
-  löysit: "loeh-sit",
-  pulloa: "pool-loh-ah",
-  käytän: "kaeh-taen",
-  juon: "yoo-ohn",
-  lopuksi: "loh-pook-see",
-  viisi: "vee-see",
-  purkkia: "poork-kee-ah",
-  hienoa: "hee-eh-noh-ah",
-  joskus: "yohs-koos",
-  yleensä: "ue-len-sae",
-  ilman: "il-mahn",
-  kaikki: "kah-ik-kee",
-  tärkeät: "taer-keh-aet",
-  opiskele: "oh-pis-keh-leh",
-  hyvin: "hue-vin",
-  varmasti: "var-mahs-ti",
-  myöhemmin: "mueh-hem-min",
-}
-
-// Convert Finnish text to phonetic approximation
-function convertToFinnishPhonetic(text) {
-  let phoneticText = text.toLowerCase()
-
-  // Apply word-specific conversions first (more specific)
-  for (const [finnish, phonetic] of Object.entries(finnishPhoneticMap)) {
-    const regex = new RegExp(finnish, "gi")
-    phoneticText = phoneticText.replace(regex, phonetic)
-  }
-
-  // Apply general Finnish pronunciation rules
-  phoneticText = phoneticText
-    // Double consonants (important in Finnish)
-    .replace(/kk/g, "k-k")
-    .replace(/ll/g, "l-l")
-    .replace(/nn/g, "n-n")
-    .replace(/pp/g, "p-p")
-    .replace(/ss/g, "s-s")
-    .replace(/tt/g, "t-t")
-
-    // Finnish vowel combinations
-    .replace(/ai/g, "ah-ee")
-    .replace(/ei/g, "eh-ee")
-    .replace(/oi/g, "oh-ee")
-    .replace(/ui/g, "oo-ee")
-    .replace(/yi/g, "ue-ee")
-    .replace(/au/g, "ah-oo")
-    .replace(/eu/g, "eh-oo")
-    .replace(/ou/g, "oh-oo")
-
-    // Add slight pauses for better pronunciation
-    .replace(/\s+/g, " ... ")
-
-  console.log(`Phonetic conversion: "${text}" -> "${phoneticText}"`)
-  return phoneticText
-}
-
-// Initialize Finnish voice system
-function initializeFinnishVoiceSystem() {
-  if (!("speechSynthesis" in window)) {
-    console.log("Speech synthesis not supported")
-    return
-  }
-
-  const loadFinnishVoices = () => {
-    const voices = speechSynthesis.getVoices()
-
-    if (voices.length > 0) {
-      console.log(`Total voices available: ${voices.length}`)
-
-      // Find Finnish voices with strict criteria
-      const finnishVoices = voices.filter((voice) => {
-        const lang = voice.lang.toLowerCase()
-        const name = voice.name.toLowerCase()
-
-        return (
-          lang === "fi-fi" ||
-          lang === "fi" ||
-          lang.startsWith("fi-") ||
-          name.includes("finnish") ||
-          name.includes("suomi") ||
-          name.includes("finland")
-        )
-      })
-
-      console.log(`Native Finnish voices found: ${finnishVoices.length}`)
-
-      if (finnishVoices.length > 0) {
-        // Always select the FIRST available Finnish voice (no randomness)
-        selectedFinnishVoice = finnishVoices[0]
-        usePhoneticFallback = false
-        console.log(`✅ Selected native Finnish voice: ${selectedFinnishVoice.name} (${selectedFinnishVoice.lang})`)
-      } else {
-        // No Finnish voices - use phonetic fallback with best available voice
-        console.log("❌ No native Finnish voices found")
-
-        // Find the best fallback voice (prefer European voices)
-        const europeanVoices = voices.filter((voice) => {
-          const lang = voice.lang.toLowerCase()
-          return (
-            lang.startsWith("sv-") || // Swedish
-            lang.startsWith("no-") || // Norwegian
-            lang.startsWith("da-") || // Danish
-            lang.startsWith("de-") || // German
-            lang.startsWith("nl-") || // Dutch
-            lang.startsWith("en-gb") // British English (better for European sounds)
-          )
-        })
-
-        if (europeanVoices.length > 0) {
-          selectedFinnishVoice = europeanVoices[0]
-          console.log(`🔄 Using European fallback voice: ${selectedFinnishVoice.name} (${selectedFinnishVoice.lang})`)
-        } else {
-          // Last resort: use any available voice
-          selectedFinnishVoice = voices[0]
-          console.log(`⚠️ Using default fallback voice: ${selectedFinnishVoice.name} (${selectedFinnishVoice.lang})`)
-        }
-
-        usePhoneticFallback = true
-        console.log("🔤 Phonetic fallback system activated")
-      }
-
-      voicesLoaded = true
-    }
-  }
-
-  // Load voices immediately
-  loadFinnishVoices()
-
-  // Listen for voice changes
-  speechSynthesis.addEventListener("voiceschanged", loadFinnishVoices)
-
-  // Force load with timeouts for different browsers
-  setTimeout(loadFinnishVoices, 100)
-  setTimeout(loadFinnishVoices, 500)
-  setTimeout(loadFinnishVoices, 1000)
-  setTimeout(loadFinnishVoices, 2000)
-}
-
-// Main Finnish speech function with native pronunciation guarantee
 function speakFinnishWord(text) {
-  console.log("🎤 Speaking Finnish:", text)
+  console.log("Speaking Finnish only:", text)
 
-  // Always stop any current speech first
+  // Stop any currently playing speech
   stopCurrentSpeech()
 
-  if (!("speechSynthesis" in window)) {
-    console.log("❌ Speech synthesis not supported")
-    return
-  }
+  if ("speechSynthesis" in window) {
+    const speakWithFinnishVoice = () => {
+      const utterance = new SpeechSynthesisUtterance(text)
 
-  // Ensure voices are loaded
-  if (!voicesLoaded) {
-    console.log("⏳ Voices not loaded yet, initializing...")
-    initializeFinnishVoiceSystem()
-    setTimeout(() => speakFinnishWord(text), 800)
-    return
-  }
+      // Force Finnish language settings with multiple fallbacks
+      utterance.lang = "fi-FI"
+      utterance.rate = 0.7
+      utterance.pitch = 1.0
+      utterance.volume = 1.0
 
-  if (!selectedFinnishVoice) {
-    console.log("❌ No voice selected")
-    return
-  }
+      const voices = speechSynthesis.getVoices()
+      console.log("Available voices:", voices.length)
 
-  try {
-    // Determine text to speak
-    let textToSpeak = text
+      // Try multiple strategies to find Finnish voices
+      let finnishVoice = null
 
-    if (usePhoneticFallback) {
-      textToSpeak = convertToFinnishPhonetic(text)
-      console.log("🔤 Using phonetic fallback")
-    } else {
-      console.log("🇫🇮 Using native Finnish voice")
+      // Strategy 1: Exact Finnish language match
+      finnishVoice = voices.find(
+        (voice) => voice.lang === "fi-FI" || voice.lang === "fi" || voice.lang.startsWith("fi-"),
+      )
+
+      // Strategy 2: Finnish name patterns (common Finnish voice names)
+      if (!finnishVoice) {
+        finnishVoice = voices.find(
+          (voice) =>
+            voice.name.toLowerCase().includes("satu") ||
+            voice.name.toLowerCase().includes("heidi") ||
+            voice.name.toLowerCase().includes("finnish") ||
+            voice.name.toLowerCase().includes("suomi"),
+        )
+      }
+
+      // Strategy 3: Force Finnish even without perfect voice match
+      if (finnishVoice) {
+        utterance.voice = finnishVoice
+        console.log("Using Finnish voice:", finnishVoice.name, finnishVoice.lang)
+      } else {
+        console.log("No Finnish voice found, forcing fi-FI language")
+        // Force Finnish language even without Finnish voice
+        utterance.lang = "fi-FI"
+        // Try to use any available voice but force Finnish language
+        if (voices.length > 0) {
+          utterance.voice = voices[0]
+          utterance.voice.lang = "fi-FI" // Override language
+        }
+      }
+
+      utterance.addEventListener("start", () => {
+        currentSpeechUtterance = utterance
+      })
+
+      utterance.addEventListener("end", () => {
+        currentSpeechUtterance = null
+      })
+
+      utterance.addEventListener("error", (event) => {
+        console.log("Speech error:", event.error)
+        currentSpeechUtterance = null
+      })
+
+      speechSynthesis.speak(utterance)
+      currentSpeechUtterance = utterance
     }
 
-    const utterance = new SpeechSynthesisUtterance(textToSpeak)
+    if (speechSynthesis.getVoices().length > 0) {
+      speakWithFinnishVoice()
+    } else {
+      speechSynthesis.addEventListener("voiceschanged", speakWithFinnishVoice, { once: true })
+    }
+  }
+}
 
-    // ALWAYS set Finnish language regardless of voice
-    utterance.lang = "fi-FI"
+// Phonetic Finnish pronunciation as ultimate fallback
+function speakPhoneticFinnish(text) {
+  console.log("Using phonetic Finnish pronunciation for:", text)
 
-    // Optimize settings for Finnish pronunciation
-    utterance.rate = 0.75 // Slightly slower for clarity
+  // Convert Finnish text to phonetic pronunciation
+  const phoneticText = convertToPhoneticFinnish(text)
+
+  if ("speechSynthesis" in window) {
+    const utterance = new SpeechSynthesisUtterance(phoneticText)
+    utterance.lang = "en-US"
+    utterance.rate = 0.5
     utterance.pitch = 1.0
     utterance.volume = 1.0
 
-    // Use the selected voice
-    utterance.voice = selectedFinnishVoice
-    console.log(`🔊 Using voice: ${selectedFinnishVoice.name} (${selectedFinnishVoice.lang})`)
-
-    // Event listeners
     utterance.addEventListener("start", () => {
       currentSpeechUtterance = utterance
-      console.log("▶️ Finnish speech started")
     })
 
     utterance.addEventListener("end", () => {
       currentSpeechUtterance = null
-      console.log("⏹️ Finnish speech completed")
     })
 
-    utterance.addEventListener("error", (event) => {
-      console.log("❌ Speech error:", event.error)
-      currentSpeechUtterance = null
-    })
-
-    // Speak with guaranteed Finnish pronunciation
     speechSynthesis.speak(utterance)
     currentSpeechUtterance = utterance
-  } catch (error) {
-    console.log("❌ Speech synthesis error:", error)
-    currentSpeechUtterance = null
   }
 }
 
-// Enhanced stop function
+// Convert Finnish text to phonetic English pronunciation
+function convertToPhoneticFinnish(text) {
+  // Common Finnish words and phrases with phonetic pronunciation
+  const phoneticMap = {
+    // Vocabulary words
+    hunaja: "HOO-nah-yah",
+    sokeri: "SOH-keh-ree",
+    juomalasit: "YUO-mah-lah-sit",
+    teepussit: "TEH-eh-poos-sit",
+    kahvitermos: "KAH-vee-ter-mohs",
+    kakkupalat: "KAK-koo-pah-laht",
+    vedenkeitin: "VEH-den-kay-tin",
+    kahviautomaatti: "KAH-vee-ah-oo-toh-mah-tee",
+    makeutusaine: "MAH-kay-oo-toos-ah-neh",
+
+    // Common phrases
+    "palaute oikea": "PAH-lah-oo-teh OY-keh-ah",
+    "väärä vastaus": "VAH-rah VAHS-tah-oos",
+    hienoa: "HEE-eh-noh-ah",
+    löysit: "LUR-sit",
+    kuvasta: "KOO-vahs-tah",
+    kaikki: "KAY-kee",
+    tärkeät: "TAR-keh-aht",
+    kahvilan: "KAH-vee-lahn",
+    tavarat: "TAH-vah-raht",
+    opiskele: "OH-pis-keh-leh",
+    sanat: "SAH-naht",
+    hyvin: "HUH-vin",
+    koska: "KOHS-kah",
+    tarvitset: "TAR-vit-set",
+    niitä: "NEE-tah",
+    varmasti: "VAR-mahs-ti",
+    myöhemmin: "MUH-hem-min",
+  }
+
+  // Try to find exact match first
+  const lowerText = text.toLowerCase().trim()
+  if (phoneticMap[lowerText]) {
+    return phoneticMap[lowerText]
+  }
+
+  // Try to find partial matches for longer sentences
+  let phoneticResult = text
+  for (const [finnish, phonetic] of Object.entries(phoneticMap)) {
+    const regex = new RegExp(`\\b${finnish}\\b`, "gi")
+    phoneticResult = phoneticResult.replace(regex, phonetic)
+  }
+
+  return phoneticResult
+}
+
+// Stop current speech function
 function stopCurrentSpeech() {
   if (speechSynthesis.speaking) {
     speechSynthesis.cancel()
   }
-  if (currentSpeechUtterance) {
-    currentSpeechUtterance = null
-  }
-  // Additional safety delay
-  setTimeout(() => {
-    if (speechSynthesis.speaking) {
-      speechSynthesis.cancel()
-    }
-  }, 50)
+  currentSpeechUtterance = null
 }
 
 // Module 2 variables
@@ -800,9 +664,6 @@ function checkFillInAnswers() {
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", () => {
-  // Initialize Finnish voice system
-  initializeFinnishVoiceSystem()
-
   // Set up vocabulary matching
   setupVocabularyMatching()
 
