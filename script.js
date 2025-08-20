@@ -430,6 +430,7 @@ function handleModule2Feedback() {
 // Module 4 variables
 let currentModule4Question = 0
 let module4CanProceed = false
+let module4FeedbackMode = "next" // can be "next" or "retry"
 
 function playModule4Question() {
   const questionText = document.getElementById("module4-question-text").textContent
@@ -442,17 +443,22 @@ function answerModule4Question(answer) {
 
   const feedbackElement = document.getElementById("module4-feedback")
   const feedbackText = document.getElementById("module4-feedback-text")
+  const feedbackBtn = document.getElementById("module4-feedback-btn")
 
   if (isCorrect) {
     module4CanProceed = true
-    feedbackElement.className = "module4-feedback correct"
+    module4FeedbackMode = "next"
     feedbackText.textContent = question.correctFeedback
+    feedbackBtn.textContent = "Seuraava kysymys"
+    feedbackElement.className = "module4-feedback correct"
     // Play Finnish voice for correct feedback
     speakFinnishWord(question.correctFeedback)
   } else {
     module4CanProceed = false
-    feedbackElement.className = "module4-feedback incorrect"
+    module4FeedbackMode = "retry"
     feedbackText.textContent = question.incorrectFeedback
+    feedbackBtn.textContent = "Yritä uudelleen"
+    feedbackElement.className = "module4-feedback incorrect"
     // Play Finnish voice for incorrect feedback
     speakFinnishWord(question.incorrectFeedback)
   }
@@ -461,20 +467,21 @@ function answerModule4Question(answer) {
 }
 
 function handleModule4Feedback() {
-  if (!module4CanProceed) {
+  if (module4FeedbackMode === "retry") {
     document.getElementById("module4-feedback").style.display = "none"
     return
   }
 
-  document.getElementById("module4-feedback").style.display = "none"
+  if (module4FeedbackMode === "next") {
+    document.getElementById("module4-feedback").style.display = "none"
 
-  if (currentModule4Question < trueFalseQuestions.length - 1) {
-    currentModule4Question++
-    updateModule4Question()
-    module4CanProceed = false // Reset for next question
-  } else {
-    // Last question completed, go directly to feedback page
-    showPage("palautetta")
+    if (currentModule4Question < trueFalseQuestions.length - 1) {
+      currentModule4Question++
+      updateModule4Question()
+      module4CanProceed = false
+    } else {
+      showPage("palautetta")
+    }
   }
 }
 
@@ -531,8 +538,6 @@ function setupVocabularyMatching() {
           // Reset selection
           wordBubbles.forEach((b) => b.classList.remove("selected"))
           currentVocabItem = null
-
-          // Don't automatically go to Module 2 - wait for "✓ Seuraava" button
         } else {
           // Wrong match - no green background, show feedback
           alert("Väärin. Yritä uudelleen.")
