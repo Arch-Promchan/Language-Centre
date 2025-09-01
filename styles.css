@@ -939,6 +939,14 @@ header {
   align-self: flex-end;
 }
 
+.module2-question-box .check-button {
+  align-self: flex-end;
+  margin-top: 1rem;
+  padding: 1rem 2rem;
+  font-size: inherit;
+  min-width: auto;
+}
+
 .module2-feedback {
   margin-top: 1rem;
 }
