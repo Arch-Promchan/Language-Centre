@@ -283,10 +283,12 @@ function playAudio(audioId) {
 // Module 2 variables
 let currentModule2Question = 0
 let module2CanProceed = false
+let isTextHidden = true
 
 function playCurrentQuestion() {
-  const questionText = document.getElementById("module2-question-text").textContent
-  speakFinnishWord(questionText)
+  const questionElement = document.getElementById("module2-question-text")
+  const originalText = questionElement.getAttribute("data-original-text") || questionElement.textContent
+  speakFinnishWord(originalText)
 }
 
 function nextModule2Question() {
@@ -332,22 +334,40 @@ function nextModule2Question() {
 }
 
 function updateModule2Question() {
-  const question = questions[currentModule2Question]
-  document.getElementById("module2-question-text").textContent = question.text
+  const questionElement = document.getElementById("module2-question-text")
+  const nextButton = document.querySelector("#moduuli2 .module-nav-button")
 
-  // Update progress
+  if (currentModule2Question < questions.length) {
+    const question = questions[currentModule2Question]
+
+    // Store original text for audio mapping
+    questionElement.setAttribute("data-original-text", question.text)
+    questionElement.textContent = question.text
+
+    // Hide text by default
+    questionElement.style.display = "none"
+    document.getElementById("text-toggle-btn").textContent = "Näytä teksti"
+
+    if (nextButton) {
+      nextButton.textContent = "Seuraava >"
+      nextButton.className = "check-button"
+    }
+
+    // Clear any previous selections
+    document.querySelectorAll(".clickable-frame").forEach((frame) => {
+      frame.classList.remove("selected", "correct", "incorrect")
+    })
+
+    // Update progress
+    updateModule2Progress()
+  }
+}
+
+function updateModule2Progress() {
   const progress = ((currentModule2Question + 1) / questions.length) * 100
   document.getElementById("module2-progress-fill").style.width = progress + "%"
   document.getElementById("module2-progress-counter").textContent =
     `${currentModule2Question + 1} / ${questions.length}`
-
-  // Hide feedback
-  document.getElementById("module2-feedback").style.display = "none"
-
-  const nextButton = document.querySelector("#moduuli2 .module-nav-button")
-  if (nextButton) {
-    nextButton.textContent = "Seuraava >"
-  }
 }
 
 // Enhanced function to check Module 2 clickable answers with Finnish voice feedback
@@ -431,10 +451,54 @@ function handleModule2Feedback() {
 let currentModule4Question = 0
 let module4CanProceed = false
 let module4FeedbackMode = "next" // can be "next" or "retry"
+let isModule4TextHidden = true
+
+function loadModule4() {
+  showPage("learning-modules")
+  showModule("moduuli4")
+
+  // Reset Module 4 state
+  currentModule4Question = 0
+  module4CanProceed = false
+  module4FeedbackMode = "next"
+  isModule4TextHidden = true
+
+  // Hide feedback and show question
+  document.getElementById("module4-feedback").style.display = "none"
+  document.querySelector(".module4-question-box").style.display = "block"
+
+  // Load first question
+  const question = trueFalseQuestions[currentModule4Question]
+  const questionElement = document.getElementById("module4-question-text")
+
+  questionElement.setAttribute("data-original-text", question.statement)
+  questionElement.textContent = question.statement
+
+  // Hide text by default and update toggle button
+  questionElement.style.display = "none"
+  document.getElementById("module4-text-toggle-btn").textContent = "Näytä teksti"
+
+  // Update progress
+  updateModule4Progress()
+}
 
 function playModule4Question() {
-  const questionText = document.getElementById("module4-question-text").textContent
-  speakFinnishWord(questionText)
+  const questionElement = document.getElementById("module4-question-text")
+  const originalText = questionElement.getAttribute("data-original-text") || questionElement.textContent
+
+  const audioId = `m4q${currentModule4Question + 1}-audio`
+  const audioElement = document.getElementById(audioId)
+
+  if (audioElement) {
+    // Stop any currently playing audio
+    stopAllAudio()
+
+    // Reset and play the audio
+    audioElement.currentTime = 0
+    audioElement.play().catch((error) => {
+      console.log("[v0] Audio play failed:", error)
+    })
+  }
 }
 
 function answerModule4Question(answer) {
@@ -478,7 +542,6 @@ function handleModule4Feedback() {
     if (currentModule4Question < trueFalseQuestions.length - 1) {
       currentModule4Question++
       updateModule4Question()
-      module4CanProceed = false
     } else {
       showPage("palautetta")
     }
@@ -487,13 +550,43 @@ function handleModule4Feedback() {
 
 function updateModule4Question() {
   const question = trueFalseQuestions[currentModule4Question]
-  document.getElementById("module4-question-text").textContent = question.statement
+  const questionElement = document.getElementById("module4-question-text")
+
+  questionElement.setAttribute("data-original-text", question.statement)
+  questionElement.textContent = question.statement
+
+  const toggleBtn = document.getElementById("module4-text-toggle-btn")
+  if (toggleBtn) {
+    toggleBtn.style.display = "inline-block"
+    questionElement.style.display = "none"
+    toggleBtn.textContent = "Näytä teksti"
+    isModule4TextHidden = true
+  }
 
   // Update progress
+  updateModule4Progress()
+}
+
+function updateModule4Progress() {
   const progress = ((currentModule4Question + 1) / trueFalseQuestions.length) * 100
   document.getElementById("module4-progress-fill").style.width = progress + "%"
   document.getElementById("module4-progress-counter").textContent =
     `${currentModule4Question + 1} / ${trueFalseQuestions.length}`
+}
+
+function toggleModule4QuestionText() {
+  const questionText = document.getElementById("module4-question-text")
+  const toggleBtn = document.getElementById("module4-text-toggle-btn")
+
+  if (isModule4TextHidden) {
+    questionText.style.display = "block"
+    toggleBtn.textContent = "Piilota teksti"
+    isModule4TextHidden = false
+  } else {
+    questionText.style.display = "none"
+    toggleBtn.textContent = "Näytä teksti"
+    isModule4TextHidden = true
+  }
 }
 
 // Enhanced function to set up vocabulary matching with proper green background logic
@@ -554,10 +647,26 @@ function checkVocabularyAnswers() {
   const totalCount = vocabularyItems.length
 
   if (matchedCount === totalCount) {
+    alert("Hienoa! Voit jatkaa eteenpäin!")
     // Go directly to Module 2
     showPage("moduuli2-start")
   } else {
     alert(`Olet yhdistänyt ${matchedCount}/${totalCount} sanaa oikein. Yhdistä kaikki sanat ennen jatkamista!`)
+  }
+}
+
+function toggleQuestionText() {
+  const questionText = document.getElementById("module2-question-text")
+  const toggleBtn = document.getElementById("text-toggle-btn")
+
+  if (isTextHidden) {
+    questionText.style.display = "block"
+    toggleBtn.textContent = "Piilota teksti"
+    isTextHidden = false
+  } else {
+    questionText.style.display = "none"
+    toggleBtn.textContent = "Näytä teksti"
+    isTextHidden = true
   }
 }
 
@@ -813,6 +922,7 @@ function showModule(sectionId) {
         const nextButton = document.querySelector("#moduuli2 .module-nav-button")
         if (nextButton) {
           nextButton.textContent = "Seuraava >"
+          nextButton.className = "check-button"
         }
       }, 50)
     }
@@ -926,4 +1036,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Set up fill-in exercises
   setupFillInExercise()
+
+  const module2QuestionText = document.getElementById("module2-question-text")
+  if (module2QuestionText) {
+    module2QuestionText.style.display = "none"
+    isTextHidden = true
+  }
+
+  const module4QuestionText = document.getElementById("module4-question-text")
+  if (module4QuestionText) {
+    module4QuestionText.style.display = "none"
+    isModule4TextHidden = true
+  }
 })
