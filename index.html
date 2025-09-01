@@ -29,10 +29,11 @@
                 <div class="hero-content">
                     <div class="hero-text">
                         <h1 class="hero-title">
-                            <span class="hero-welcome">Tervetuloa</span><br>
-                            <span class="hero-main">Suomen kielen oppiminen.</span>
+                            <!-- Updated welcome text per teacher feedback -->
+                            <span class="hero-welcome">Hyvä kansainvälinen opiskelija,</span><br>
+                            <span class="hero-main">tervetuloa oppimaan suomea!</span>
                         </h1>
-                        <p class="hero-subtitle">Kansainvälisille opiskelijoille</p>
+                        <!-- Removed subtitle as it's now part of main title -->
                         <p class="hero-description">
                             Tervetuloa suomen kielen oppimisalustalle! Tämä alusta on suunniteltu 
                             auttamaan kansainvälisiä opiskelijoita oppimaan suomen kielen sanastoa 
@@ -55,8 +56,9 @@
                 <div class="learning-path-sidebar">
                     <h2>Oppimispolku</h2>
                     <p>
-                        Suorita nämä neljä interaktiivista moduulia hallitaksesi suomen kielen sanastoa ja 
-                        keskustelutaitoja työpaikka-asetuksissa. Jokainen moduuli rakentuu edellisen 
+                        <!-- Updated learning path description per teacher feedback -->
+                        Suorita nämä neljä interaktiivista moduulia ja opit samalla sanastoa ja 
+                        keskustelufraaseja. Jokainen moduuli rakentuu edellisen 
                         päälle optimaalisen oppimisen takaamiseksi.
                     </p>
                 </div>
@@ -68,9 +70,8 @@
                         </div>
                         <h3>Perussanasto</h3>
                         <p>
-                            Opi oleellista suomen sanastoa työpaikan taukohuoneeseen. 
-                            Hallitse äänteäminen äänioppaiden avulla ja harjoittele sana-kuva-
-                            yhdistämisharjoituksia.
+                            <!-- Updated Module 1 description per teacher feedback -->
+                            Opi hyödyllistä sanastoa kuvien avulla ja harjoittele myös ääntämistä.
                         </p>
                         <button class="module-start-btn" onclick="showPage('moduuli1-start')">
                             Aloita oppiminen →
@@ -92,9 +93,9 @@
                         </div>
                         <h3>Kuullun ymmärtäminen</h3>
                         <p>
-                            Harjoittele puhujan suomen ymmärtämistä kahviympäristössä. 
-                            Klikkaa kuvaa ääniohjeiden perusteella parantaaksesi 
-                            kuunteluharjoituksia.
+                            <!-- Updated Module 2 description per teacher feedback -->
+                            Harjoittele kuullun ymmärtämistä kahvilaympäristössä. 
+                            Kuuntele ja klikkaa oikeaa kuvaa.
                         </p>
                         <button class="module-start-btn" onclick="showPage('moduuli2-start')">
                             Aloita oppiminen →
@@ -116,9 +117,8 @@
                         </div>
                         <h3>Sana- ja lauseharjoitukset</h3>
                         <p>
-                            Harjoittele suomalaisten lauseiden muodostamista ja verbien oikeaa 
-                            käyttöä. Suorita kolme erilaista harjoitusta hallitaksesi 
-                            lauseenmuodostuksen ja verbien käytön.
+                            <!-- Updated Module 3 description per teacher feedback -->
+                            Harjoittele lauseiden muodostusta ja verbejä.
                         </p>
                         <button class="module-start-btn" onclick="showPage('moduuli3')">
                             Aloita oppiminen →
@@ -140,8 +140,9 @@
                         </div>
                         <h3>Kuullun ymmärtämisen testi</h3>
                         <p>
-                            Testaa suomen ymmärtämistäsi tosielämän tekstipohjaisella testillä. Kuuntele 
-                            lausuntoja kahvilakuvasta ja määritä, ovatko ne oikeita vai vääriä.
+                            <!-- Updated Module 4 description per teacher feedback -->
+                            Testaa suomen kielen ymmärtämistäsi autenttisella tekstillä. Lue, 
+                            kuuntele ja harjoittele ääntämistä.
                         </p>
                         <button class="module-start-btn" onclick="showPage('moduuli4')">
                             Aloita oppiminen →
@@ -428,9 +429,12 @@
                                             <button class="module2-play-btn" onclick="playCurrentQuestion()">
                                                 <span class="play-icon">▶</span>
                                             </button>
-                                            <p id="module2-question-text">Hei! Tämä on mukava kahvila. Tässä kahvilassa on itsepalvelu. Se tarkoittaa, että sinä voit ottaa kahvia tai teetä itse. Kuvassa on paljon kaikkea sellaista, mitä tarvitset kahvilassa. Etsi minulle kuvasta seuraavat tavarat:</p>
+                                             <!-- CHANGE> Question text will be hidden by default via JavaScript -->
+                                            <p id="module2-question-text" style="display: none;">Hei! Tämä on mukava kahvila. Tässä kahvilassa on itsepalvelu. Se tarkoittaa, että sinä voit ottaa kahvia tai teetä itse. Kuvassa on paljon kaikkea sellaista, mitä tarvitset kahvilassa. Etsi minulle kuvasta seuraavat tavarat:</p>
+                                            <button class="text-toggle-btn" id="text-toggle-btn" onclick="toggleQuestionText()">Näytä teksti</button>
                                         </div>
-                                        <button class="module2-next-btn" onclick="nextModule2Question()">Seuraava ></button>
+                                         <!-- CHANGE> Use standard check-button class instead of module-nav-button -->
+                                        <button class="check-button" onclick="nextModule2Question()">Seuraava ></button>
                                     </div>
                                     
                                     <div class="module2-feedback" id="module2-feedback" style="display: none;">
@@ -466,12 +470,14 @@
                         <div class="exercise-content">
                             <div id="exercise-a" class="exercise-section active">
                                 <h3 class="exercise-title">A. Harjoittele sanoja lisää. Yhdistä lauseet oikein.</h3>
-                                <p class="exercise-instruction">Klikkaa suomalaista lausetta, sitten klikkaa sen jatkoa</p>
+                                <!-- Updated Module 3 instruction per teacher feedback -->
+                                <p class="exercise-instruction">Klikkaa lauseen alkua ja sitten sen loppua.</p>
                                 
                                 <div class="matching-exercise">
                                     <div class="matching-container">
                                         <div class="matching-left">
-                                            <h4>Suomalaiset lauseet</h4>
+                                            <!-- Updated section header per teacher feedback -->
+                                            <h4>Lauseen alku</h4>
                                             <div class="matching-item" data-id="4">Otatko jotain</div>
                                             <div class="matching-item" data-id="1">Haluaisitko</div>
                                             <div class="matching-item" data-id="6">Onko kahvitermoksessa</div>
@@ -481,7 +487,8 @@
                                         </div>
                                         
                                         <div class="matching-right">
-                                            <h4>Lauseiden jatkot</h4>
+                                            <!-- Updated section header per teacher feedback -->
+                                            <h4>Lauseen loppu</h4>
                                             <div class="matching-slot" data-match="1">ottaa kahvia vai teetä?</div>
                                             <div class="matching-slot" data-match="2">makeutusainetta?</div>
                                             <div class="matching-slot" data-match="3">hunajaa?</div>
@@ -502,12 +509,14 @@
 
                             <div id="exercise-b" class="exercise-section">
                                 <h3 class="exercise-title">B. Harjoittele lisää sanoja. Yhdistä lauseet oikein.</h3>
-                                <p class="exercise-instruction">Klikkaa suomalaista lausetta, sitten klikkaa sen jatkoa</p>
+                                <!-- Updated Module 3 instruction per teacher feedback -->
+                                <p class="exercise-instruction">Klikkaa lauseen alkua ja sitten sen loppua.</p>
                                 
                                 <div class="matching-exercise">
                                     <div class="matching-container">
                                         <div class="matching-left">
-                                            <h4>Suomalaiset lauseet</h4>
+                                            <!-- Updated section header per teacher feedback -->
+                                            <h4>Lauseen alku</h4>
                                             <div class="matching-item" data-id="3">Kahviautomaatti</div>
                                             <div class="matching-item" data-id="6">Kakkupalat</div>
                                             <div class="matching-item" data-id="1">Kahvitermos</div>
@@ -517,7 +526,8 @@
                                         </div>
                                         
                                         <div class="matching-right">
-                                            <h4>Lauseiden jatkot</h4>
+                                            <!-- Updated section header per teacher feedback -->
+                                            <h4>Lauseen loppu</h4>
                                             <div class="matching-slot" data-match="1">on tyhjä.</div>
                                             <div class="matching-slot" data-match="2">toimi.</div>
                                             <div class="matching-slot" data-match="3">on rikki.</div>
@@ -598,7 +608,9 @@
                                             <button class="module4-play-btn" onclick="playModule4Question()">
                                                 <span class="play-icon">▶</span>
                                             </button>
-                                            <p id="module4-question-text">Kahvilan seinä on vihreä.</p>
+                                             <!-- CHANGE> Question text will be hidden by default via JavaScript -->
+                                            <p id="module4-question-text" style="display: none;">Kahvilan seinä on vihreä.</p>
+                                            <button class="text-toggle-btn" id="module4-text-toggle-btn" onclick="toggleModule4QuestionText()">Näytä teksti</button>
                                         </div>
                                         <div class="module4-answer-buttons">
                                             <button class="module4-answer-btn correct-btn" onclick="answerModule4Question('true')">oikein</button>
